@@ -6,7 +6,9 @@
       "Bash(claude mcp *)",
       "Bash(npx -y shadcn@latest mcp --help)",
       "Bash(npx -y shadcn@latest mcp init --help)",
-      "Bash(npx -y shadcn@latest mcp init --client claude)"
+      "Bash(npx -y shadcn@latest mcp init --client claude)",
+      "Bash(npx -y shadcn@latest mcp --cwd client)",
+      "Bash(npx -y shadcn@latest add button input textarea label radio-group badge card alert dialog separator sonner --yes --overwrite)"
     ],
     "additionalDirectories": [
       "d:\\nutzlock-tracker\\client"
