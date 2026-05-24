@@ -1,0 +1,2 @@
+"""Nutzlock Tracker API package."""
+

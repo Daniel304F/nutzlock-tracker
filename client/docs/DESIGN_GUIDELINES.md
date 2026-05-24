@@ -1,0 +1,44 @@
+# Design Guidelines
+
+## Product Feel
+
+This is a play-session tool, not a brochure. The first screen should help the player manage runs, rooms, encounters, teams, and warnings.
+
+The interface should be:
+
+- quick to scan while playing,
+- comfortable on a phone next to a TV or monitor,
+- calm enough for repeated edits,
+- explicit when a rule warning or death propagation matters.
+
+## Layout
+
+- Prefer app shell layouts, dense lists, segmented controls, and clear action bars.
+- Avoid oversized hero sections.
+- Avoid decorative backgrounds that compete with sprites and status colors.
+- On mobile, stack Soullink partners while keeping the shared route/link obvious.
+- Keep all fixed-format controls dimensionally stable.
+
+## Components
+
+- Buttons: icon plus label for important commands, icon-only only for familiar repeated tools with tooltips.
+- Toggles: clauses, randomizer mode, room sharing, read-only link.
+- Inputs: level, nickname, seed, route name.
+- Combobox/search: species, edition, location.
+- Dialogs: destructive actions such as deleting a run or marking a death.
+- Tabs: Team, Box, Graveyard, Encounters, Rules.
+
+## Status Language
+
+- Alive/team: active, available, legal.
+- Box: available but not in party.
+- Dead/graveyard: locked, archived, never reusable.
+- Incomplete link: visible warning, not a death.
+- Rule issue: warning first, block only when the requirements explicitly demand it.
+
+## Visual System
+
+Use `.interface-design/system.md` as the source of reusable spacing, radius, color-role, and status decisions.
+
+Update that file when a new reusable pattern is established.
+
