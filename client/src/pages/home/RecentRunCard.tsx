@@ -1,4 +1,11 @@
 import type { RunResponse } from "@api/runs";
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { RunBadge } from "@pages/home/RunBadge";
 
 type RecentRunCardProps = {
@@ -14,21 +21,21 @@ function formatUpdatedAt(updatedAt: string) {
 
 export function RecentRunCard({ run }: RecentRunCardProps) {
   return (
-    <article className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold text-zinc-950">{run.name}</h3>
-          <p className="mt-1 text-sm text-zinc-600">
-            {run.game_version_ref} - updated {formatUpdatedAt(run.updated_at)}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+    <Card className="gap-3 rounded-lg py-4">
+      <CardHeader className="px-4">
+        <CardTitle className="truncate text-base font-semibold text-foreground">
+          {run.name}
+        </CardTitle>
+        <CardDescription>
+          {run.game_version_ref} - updated {formatUpdatedAt(run.updated_at)}
+        </CardDescription>
+        <CardAction className="flex flex-wrap gap-2">
           <RunBadge tone={run.challenge_mode === "soullink" ? "sky" : "emerald"}>
             {run.challenge_mode}
           </RunBadge>
           {run.is_randomizer ? <RunBadge tone="violet">RNG</RunBadge> : null}
-        </div>
-      </div>
-    </article>
+        </CardAction>
+      </CardHeader>
+    </Card>
   );
 }

@@ -1,30 +1,45 @@
 import { FileUp, Link2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
+type EntryActionProps = {
+  description: string;
+  icon: typeof Link2;
+  iconClassName?: string;
+  title: string;
+};
+
+function EntryAction({ description, icon: Icon, iconClassName, title }: EntryActionProps) {
+  return (
+    <Button
+      className="h-auto min-h-20 w-full justify-start gap-3 border-dashed px-4 py-3 text-left whitespace-normal"
+      disabled
+      type="button"
+      variant="outline"
+    >
+      <Icon aria-hidden="true" className={iconClassName ?? "size-5 text-foreground"} />
+      <span className="flex flex-col items-start gap-0.5">
+        <span className="font-semibold text-foreground">{title}</span>
+        <span className="text-xs text-muted-foreground">{description}</span>
+      </span>
+    </Button>
+  );
+}
+
 export function EntryActionCards() {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <button
-        className="flex min-h-20 items-center gap-3 rounded-lg border border-dashed border-sky-300 bg-white px-4 py-3 text-left text-sm text-zinc-500"
-        disabled
-        type="button"
-      >
-        <Link2 aria-hidden="true" className="h-5 w-5 text-sky-700" />
-        <span>
-          <span className="block font-semibold text-zinc-700">Join room</span>
-          <span className="block">Room membership lands after runs.</span>
-        </span>
-      </button>
-      <button
-        className="flex min-h-20 items-center gap-3 rounded-lg border border-dashed border-zinc-300 bg-white px-4 py-3 text-left text-sm text-zinc-500"
-        disabled
-        type="button"
-      >
-        <FileUp aria-hidden="true" className="h-5 w-5 text-zinc-700" />
-        <span>
-          <span className="block font-semibold text-zinc-700">Import JSON</span>
-          <span className="block">Backup restore comes with export shape.</span>
-        </span>
-      </button>
+      <EntryAction
+        description="Room membership lands after runs."
+        icon={Link2}
+        iconClassName="size-5 text-sky-700"
+        title="Join room"
+      />
+      <EntryAction
+        description="Backup restore comes with export shape."
+        icon={FileUp}
+        title="Import JSON"
+      />
     </div>
   );
 }

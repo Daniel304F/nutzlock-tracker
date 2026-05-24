@@ -1,7 +1,14 @@
 import { Plus, Shuffle, User, Users, type LucideIcon } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 
 import type { ChallengeMode, RunCreateInput, RunResponse } from "@api/runs";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 type NewRunFormProps = {
   onCreateRun: (input: RunCreateInput) => Promise<RunResponse>;
@@ -59,6 +66,9 @@ function buildRunInput(formData: FormData, setupMode: RunSetupMode) {
 export function NewRunForm({ onCreateRun }: NewRunFormProps) {
   const [setupMode, setSetupMode] = useState<RunSetupMode>("nuzlocke");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const nameId = useId();
+  const editionId = useId();
+  const notesId = useId();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -77,93 +87,104 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
   }
 
   return (
-    <form className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm" onSubmit={handleSubmit}>
-      <div className="flex items-center gap-3">
-        <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
-          <Plus aria-hidden="true" className="h-5 w-5" />
-        </span>
-        <div>
-          <h2 className="text-base font-semibold text-zinc-950">New run</h2>
-          <p className="text-sm text-zinc-600">Basics first, rooms and rules next.</p>
-        </div>
-      </div>
-
-      <div className="mt-5 space-y-4">
-        <label className="block">
-          <span className="text-sm font-medium text-zinc-800">Run name</span>
-          <input
-            className="mt-1 min-h-11 w-full rounded-md border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100"
-            name="name"
-            placeholder="Heartgold w/ Sam"
-            required
-            type="text"
-          />
-        </label>
-
-        <fieldset>
-          <legend className="text-sm font-medium text-zinc-800">Mode</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
-            {runSetupModes.map((mode) => {
-              const Icon = mode.icon;
-              const isSelected = setupMode === mode.value;
-
-              return (
-                <label
-                  className={`flex min-h-16 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors ${
-                    isSelected
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-900"
-                      : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
-                  }`}
-                  key={mode.value}
-                >
-                  <input
-                    checked={isSelected}
-                    className="sr-only"
-                    name="run_setup_mode"
-                    type="radio"
-                    value={mode.value}
-                    onChange={() => setSetupMode(mode.value)}
-                  />
-                  <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
-                  <span>
-                    <span className="block font-semibold">{mode.label}</span>
-                    <span className="block text-xs text-zinc-600">{mode.description}</span>
-                  </span>
-                </label>
-              );
-            })}
+    <Card className="gap-5 rounded-lg p-5">
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+            <Plus aria-hidden="true" className="h-5 w-5" />
+          </span>
+          <div>
+            <h2 className="text-base font-semibold text-foreground">New run</h2>
+            <p className="text-sm text-muted-foreground">
+              Basics first, rooms and rules next.
+            </p>
           </div>
-        </fieldset>
+        </div>
 
-        <label className="block">
-          <span className="text-sm font-medium text-zinc-800">Edition key</span>
-          <input
-            className="mt-1 min-h-11 w-full rounded-md border border-zinc-300 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100"
-            defaultValue="emerald"
-            name="game_version_ref"
-            required
-            type="text"
-          />
-        </label>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor={nameId}>Run name</Label>
+            <Input
+              className="min-h-11 bg-secondary"
+              id={nameId}
+              name="name"
+              placeholder="Heartgold w/ Sam"
+              required
+              type="text"
+            />
+          </div>
 
-        <label className="block">
-          <span className="text-sm font-medium text-zinc-800">Notes</span>
-          <textarea
-            className="mt-1 min-h-20 w-full resize-y rounded-md border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100"
-            name="notes"
-            placeholder="Seed, partner, route plan"
-          />
-        </label>
-      </div>
+          <fieldset>
+            <legend className="text-sm font-medium text-foreground">Mode</legend>
+            <RadioGroup
+              className="mt-2 grid gap-2 sm:grid-cols-3"
+              name="run_setup_mode"
+              value={setupMode}
+              onValueChange={(value) => setSetupMode(value as RunSetupMode)}
+            >
+              {runSetupModes.map((mode) => {
+                const Icon = mode.icon;
+                const isSelected = setupMode === mode.value;
+                const itemId = `${nameId}-mode-${mode.value}`;
 
-      <button
-        className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-emerald-700 bg-emerald-700 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={isSubmitting}
-        type="submit"
-      >
-        <Plus aria-hidden="true" className="h-4 w-4" />
-        Create run
-      </button>
-    </form>
+                return (
+                  <Label
+                    htmlFor={itemId}
+                    key={mode.value}
+                    className={cn(
+                      "flex min-h-16 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
+                      isSelected
+                        ? "border-emerald-600 bg-emerald-50 text-emerald-900"
+                        : "border-border bg-card text-foreground hover:bg-secondary",
+                    )}
+                  >
+                    <RadioGroupItem
+                      aria-label={mode.label}
+                      className="sr-only"
+                      id={itemId}
+                      value={mode.value}
+                    />
+                    <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
+                    <span>
+                      <span className="block font-semibold">{mode.label}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {mode.description}
+                      </span>
+                    </span>
+                  </Label>
+                );
+              })}
+            </RadioGroup>
+          </fieldset>
+
+          <div className="space-y-1.5">
+            <Label htmlFor={editionId}>Edition key</Label>
+            <Input
+              className="min-h-11 bg-secondary"
+              defaultValue="emerald"
+              id={editionId}
+              name="game_version_ref"
+              required
+              type="text"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor={notesId}>Notes</Label>
+            <Textarea
+              className="min-h-20 bg-secondary"
+              id={notesId}
+              name="notes"
+              placeholder="Seed, partner, route plan"
+            />
+          </div>
+        </div>
+
+        <Button className="min-h-11 w-full" disabled={isSubmitting} type="submit">
+          <Plus aria-hidden="true" />
+          Create run
+        </Button>
+      </form>
+    </Card>
   );
 }
