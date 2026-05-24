@@ -42,3 +42,17 @@ Use `.interface-design/system.md` as the source of reusable spacing, radius, col
 
 Update that file when a new reusable pattern is established.
 
+## Styling Stack
+
+- Tailwind CSS v4 (CSS-first configuration via `@theme` blocks in [src/index.css](../src/index.css)). There is no `tailwind.config.cjs`; tokens live in CSS custom properties.
+- The Vite plugin `@tailwindcss/vite` compiles utilities; PostCSS is no longer used.
+- shadcn/ui (style: `new-york`, base color: `zinc`) is the component library. Project config: [components.json](../../client/components.json).
+- Color, radius, and dark-mode tokens are defined as OKLCH custom properties in `:root` / `.dark` and bridged into Tailwind via `@theme inline`.
+- The `cn()` helper in [src/lib/utils.ts](../src/lib/utils.ts) merges class names through `clsx` + `tailwind-merge`. Use it whenever a component composes conditional classes.
+
+## Component Conventions
+
+- Generated shadcn primitives live in `src/components/ui/`. Treat them as project code: edit them when the tracker needs different variants instead of wrapping them in additional abstractions.
+- Compose feature components (`src/pages/...`, `src/layout/...`) out of shadcn primitives where one exists. Add a new primitive via `npx shadcn@latest add <component>` before hand-rolling.
+- Status-bearing primitives (Button, Badge, Alert, Dialog) must keep the project's semantic color mapping: emerald primary, sky for room/link, amber for warnings, rose for death, violet for box. Override variants in the shadcn component file rather than at the call site.
+

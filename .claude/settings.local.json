@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite *)",
+      "Bash(npx vitest *)",
+      "Bash(claude mcp *)",
+      "Bash(npx -y shadcn@latest mcp --help)",
+      "Bash(npx -y shadcn@latest mcp init --help)",
+      "Bash(npx -y shadcn@latest mcp init --client claude)"
+    ],
+    "additionalDirectories": [
+      "d:\\nutzlock-tracker\\client"
+    ]
+  }
+}

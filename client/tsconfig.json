@@ -11,6 +11,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
+      "@/*": ["./src/*"],
       "@api/*": ["./src/api/*"],
       "@assets/*": ["./src/assets/*"],
       "@components/*": ["./src/components/*"],

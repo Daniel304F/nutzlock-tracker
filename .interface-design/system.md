@@ -10,31 +10,39 @@ Best for: tracker dashboards, encounter entry, room state, roster management, gr
 
 ## Tokens
 
+Tokens are declared as CSS custom properties in `client/src/index.css` and exposed to Tailwind v4 utilities through the `@theme` / `@theme inline` blocks. There is no `tailwind.config.cjs` — adding a token means adding a CSS variable, not editing a JS config.
+
 Spacing base: 4px
 
 Scale: 4, 8, 12, 16, 20, 24, 32, 40
 
 Radius:
 
-- Controls: 6px
-- Cards and repeated items: 8px
-- Dialogs: 8px
+- Source token: `--radius` (0.5rem). Derived `--radius-sm/md/lg/xl` are exposed via `@theme inline`.
+- Controls: 6px (`rounded-md`)
+- Cards and repeated items: 8px (`rounded-lg`)
+- Dialogs: 8px (`rounded-lg`)
 
 Typography:
 
-- Body: system sans-serif
+- Body: `--font-sans` (Inter + system fallback stack), reachable via `font-sans`.
 - Letter spacing: 0
 - Dense panels should use compact headings, not hero-scale text.
 
-Color roles:
+Color roles (semantic shadcn tokens, generated from OKLCH custom properties):
 
-- Page: warm white / neutral zinc
-- Text: zinc-950
-- Muted text: zinc-600
-- Primary action: emerald
+- Page background: `bg-background` (warm white in light, near-black in dark)
+- Text: `text-foreground`
+- Muted text: `text-muted-foreground`
+- Surfaces: `bg-card`, `bg-popover`
+- Primary action: `bg-primary` / `text-primary-foreground` (emerald in both themes)
+- Borders & focus rings: `border-border`, `ring-ring`
+- Destructive / death: `bg-destructive` / `text-destructive-foreground` (rose)
+
+Accent roles kept from the play-session palette and applied via Tailwind utilities (`bg-sky-*`, `bg-amber-*`, `bg-violet-*`):
+
 - Link/room accent: sky
 - Warning: amber
-- Danger/death: rose
 - Box/bench: violet
 
 Avoid a one-hue UI. Status colors must be paired with icons or labels, not color alone.
@@ -81,10 +89,17 @@ Status treatment:
 Overlays:
 
 - Use the global `ModalProvider` for app-wide dialogs instead of local modal state when a flow needs confirmation from multiple features.
-- Dialogs use Radix Dialog, an understated zinc overlay, 8px radius, a white elevated surface, border separation, and a compact title/description header.
+- Dialogs build on the shadcn `Dialog` primitive (Radix under the hood), an understated zinc overlay, 8px radius, a white elevated surface, border separation, and a compact title/description header.
 - Destructive or irreversible actions, especially death, delete, archive, and propagation-related actions, should use the modal service `confirm` flow.
 - Primary modal actions map to semantic intent: emerald for default, amber for warning, rose for danger/death.
 - Mobile dialogs must fit within `100dvh`, keep actions reachable at the bottom, and stack actions vertically when space is narrow.
+
+## Component Library
+
+- shadcn/ui (style: `new-york`, base color: `zinc`) is the source for primitives. Config: `client/components.json`.
+- Generated primitives live in `client/src/components/ui/`. They are project code and may be edited rather than wrapped in extra abstractions.
+- Add new primitives from inside `client/` with `npx shadcn@latest add <component>` (e.g. `button`, `dialog`, `select`, `tooltip`).
+- Compose class names via the `cn()` helper in `client/src/lib/utils.ts` (clsx + tailwind-merge).
 
 Toasts:
 
