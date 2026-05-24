@@ -1,5 +1,7 @@
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
+
+import { Toaster } from "@/components/ui/sonner";
 
 export type ToastAction = {
   label: string;
@@ -56,23 +58,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
         expand={false}
         position="top-right"
         richColors
-        toastOptions={{
-          classNames: {
-            actionButton:
-              "rounded-md bg-emerald-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-800",
-            cancelButton:
-              "rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-semibold text-zinc-800 hover:bg-zinc-50",
-            closeButton: "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50",
-            description: "text-sm text-zinc-600",
-            error: "border-rose-200",
-            info: "border-sky-200",
-            success: "border-emerald-200",
-            title: "text-sm font-semibold text-zinc-950",
-            toast: "rounded-lg border border-zinc-200 bg-white text-zinc-950 shadow-lg",
-            warning: "border-amber-200",
-          },
-          duration: 4500,
-        }}
+        toastOptions={{ duration: 4500 }}
       />
     </ToastServiceContext.Provider>
   );
