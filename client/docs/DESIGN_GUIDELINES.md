@@ -10,6 +10,7 @@ The interface should be:
 - comfortable on a phone next to a TV or monitor,
 - calm enough for repeated edits,
 - explicit when a rule warning or death propagation matters.
+- vivid in a controlled way, using Hibiscus Aura accents over Urban Nocturne neutrals.
 
 ## Layout
 
@@ -18,6 +19,7 @@ The interface should be:
 - Avoid decorative backgrounds that compete with sprites and status colors.
 - On mobile, stack Soullink partners while keeping the shared route/link obvious.
 - Keep all fixed-format controls dimensionally stable.
+- Keep the home screen as an app workspace: command summary, setup form, room/import actions, and recent runs.
 
 ## Components
 
@@ -49,10 +51,11 @@ Update that file when a new reusable pattern is established.
 - shadcn/ui (style: `new-york`, base color: `zinc`) is the component library. Project config: [components.json](../../client/components.json).
 - Color, radius, and dark-mode tokens are defined as OKLCH custom properties in `:root` / `.dark` and bridged into Tailwind via `@theme inline`.
 - The `cn()` helper in [src/lib/utils.ts](../src/lib/utils.ts) merges class names through `clsx` + `tailwind-merge`. Use it whenever a component composes conditional classes.
+- Dark mode is provided through `next-themes`; keep the global theme toggle in the app shell.
+- Palette utilities are exposed as Tailwind tokens: `hibiscus`, `ruby`, `aura`, `indigo`, `nocturne`, `charcoal`, `mist`, `neon`, and `steel`.
 
 ## Component Conventions
 
 - Generated shadcn primitives live in `src/components/ui/`. Treat them as project code: edit them when the tracker needs different variants instead of wrapping them in additional abstractions.
 - Compose feature components (`src/pages/...`, `src/layout/...`) out of shadcn primitives where one exists. Add a new primitive via `npx shadcn@latest add <component>` before hand-rolling.
 - Status-bearing primitives (Button, Badge, Alert, Dialog) must keep the project's semantic color mapping: emerald primary, sky for room/link, amber for warnings, rose for death, violet for box. Override variants in the shadcn component file rather than at the call site.
-

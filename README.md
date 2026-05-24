@@ -6,7 +6,6 @@ The first project phase is intentionally focused on agent-friendly structure:
 
 - `AGENTS.md` gives AI coding agents the shared project rules.
 - `docs/ENTITIES.md` gives agents the canonical domain entity reference.
-- `docs/WIREFRAMES.md` and `docs/wireframes.pdf` give agents the layout and workflow reference.
 - `client/AGENTS.md` adds React 19 + Tailwind CSS 4 + shadcn/ui rules.
 - `server/AGENTS.md` adds FastAPI + uv + SQLite rules.
 - `.agents/skills/` contains installed external project skills.

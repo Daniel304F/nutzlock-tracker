@@ -6,8 +6,6 @@ Also read:
 
 - Root `AGENTS.md`
 - `docs/ENTITIES.md`
-- `docs/WIREFRAMES.md`
-- `docs/wireframes.pdf`
 - `.agents/skills/vercel-react-best-practices/SKILL.md`
 - `.agents/skills/interface-design/SKILL.md`
 - `.interface-design/system.md`
@@ -36,7 +34,6 @@ Also read:
 ## UI Rules
 
 - Build the app experience directly. Do not add a marketing landing page.
-- Use `docs/wireframes.pdf` as the layout and flow reference for page-level UI.
 - Keep components reusable, as small as possible and as large as necessary.
 - Mobile browser workflows must be complete and touch-friendly.
 - Use status labels/icons in addition to color.

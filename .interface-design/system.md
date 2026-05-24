@@ -2,9 +2,9 @@
 
 ## Direction
 
-Personality: focused companion tool for active play sessions.
+Personality: focused companion tool for active play sessions with a sharper gaming-console edge.
 
-Foundation: utility and clarity with a little adventure-table flavor. The UI should feel practical beside a game screen: quick to scan, touch-friendly, and calm under repeated use.
+Foundation: utility and clarity with Hibiscus Aura energy and Urban Nocturne contrast. The UI should feel practical beside a game screen: quick to scan, touch-friendly, vivid enough to feel alive, and calm enough for repeated use.
 
 Best for: tracker dashboards, encounter entry, room state, roster management, graveyard history, and rule warnings.
 
@@ -29,37 +29,43 @@ Typography:
 - Letter spacing: 0
 - Dense panels should use compact headings, not hero-scale text.
 
-Color roles (semantic shadcn tokens, generated from OKLCH custom properties):
+Color roles (semantic shadcn tokens, generated from supplied palettes):
 
-- Page background: `bg-background` (warm white in light, near-black in dark)
+- Page background: `bg-background` (`#f7f7f5` in light, Urban Nocturne `#141414` in dark)
 - Text: `text-foreground`
 - Muted text: `text-muted-foreground`
 - Surfaces: `bg-card`, `bg-popover`
-- Primary action: `bg-primary` / `text-primary-foreground` (emerald in both themes)
+- Primary action: `bg-primary` / `text-primary-foreground` (Hibiscus indigo `#5848B3` in light, neon `#E2E800` in dark)
 - Borders & focus rings: `border-border`, `ring-ring`
-- Destructive / death: `bg-destructive` / `text-destructive-foreground` (rose)
+- Destructive / death: `bg-destructive` / `text-destructive-foreground` (ruby `#DD3027`)
 
-Accent roles kept from the play-session palette and applied via Tailwind utilities (`bg-sky-*`, `bg-amber-*`, `bg-violet-*`):
+Palette utilities exposed through Tailwind tokens:
 
-- Link/room accent: sky
-- Warning: amber
-- Box/bench: violet
+- Hibiscus: `bg-hibiscus` / `text-hibiscus` (`#EA44D4`)
+- Ruby: `bg-ruby` / `text-ruby` (`#DD3027`)
+- Aura purple: `bg-aura` / `text-aura` (`#733D6F`)
+- Indigo: `bg-indigo` / `text-indigo` (`#5848B3`)
+- Urban neutrals: `bg-nocturne`, `bg-charcoal`, `bg-mist`, `bg-steel`
+- Warning / high-energy signal: `bg-neon` / `text-neon` (`#E2E800`)
 
 Avoid a one-hue UI. Status colors must be paired with icons or labels, not color alone.
 
 ## Patterns
 
-Wireframes:
-
-- Use `docs/wireframes.pdf` as the source for page flow, layout shape, and mobile/desktop relationships.
-- Use `docs/WIREFRAMES.md` for the page map and implementation notes.
-- Treat wireframes as hierarchy and workflow guidance, not pixel-perfect styling.
-
 App shell:
 
 - Top-level app experience first, not a marketing landing page.
+- Use the palette rail and compact brand tile as the product signature.
 - Primary navigation should remain predictable on desktop and mobile.
 - Do not hide core actions behind hover-only affordances.
+- Keep the theme toggle visible in the global header.
+
+Home workspace:
+
+- Use a compact command-center hero, not a marketing hero.
+- Keep the run creation form prominent and sticky on wide screens.
+- On mobile, stack hero, actions, recent runs, and setup without horizontal scrolling.
+- Preserve the run creation API object shape when restyling the form.
 
 Cards:
 
@@ -81,10 +87,10 @@ Tables/lists:
 
 Status treatment:
 
-- Alive/team: emerald mark plus text.
+- Alive/team: neon or primary mark plus text.
 - Box: violet mark plus text.
-- Death/graveyard: rose mark plus text.
-- Rule warning: amber mark plus direct explanation.
+- Death/graveyard: ruby mark plus text.
+- Rule warning: neon mark plus direct explanation.
 
 Overlays:
 

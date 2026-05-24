@@ -7,11 +7,10 @@ Read these first:
 1. `docs/Anforderungsbogen_Nuzlocke_Soullink_Tracker (1).md`
 2. `docs/ARCHITECTURE.md`
 3. `docs/ENTITIES.md`
-4. `docs/WIREFRAMES.md` and `docs/wireframes.pdf` when changing UI or layout
-5. `.agents/skills/vercel-react-best-practices/SKILL.md` when changing React code
-6. `.agents/skills/interface-design/SKILL.md` when changing UI
-7. `.interface-design/system.md`
-8. The nearest nested `AGENTS.md`
+4. `.agents/skills/vercel-react-best-practices/SKILL.md` when changing React code
+5. `.agents/skills/interface-design/SKILL.md` when changing UI
+6. `.interface-design/system.md`
+7. The nearest nested `AGENTS.md`
 
 ## Product Priorities
 
@@ -34,7 +33,6 @@ Read these first:
 - Implement at most one feature at a time. If a request contains multiple features, finish and verify one vertical slice before starting the next.
 - Do not consider a feature complete until the relevant frontend and/or backend tests pass.
 - Read `docs/ENTITIES.md` before adding or changing domain models, API schemas, TypeScript domain types, persistence, or UI state shape.
-- Read `docs/WIREFRAMES.md` and inspect `docs/wireframes.pdf` before page-level UI or layout work.
 - Keep changes scoped and update the relevant docs when a convention changes.
 - Use installed project skills from `.agents/skills/` when their scope matches the task.
 - Prefer established UI libraries for the web interface. Use shadcn/ui primitives from `client/src/components/ui/` first, with Radix UI behavior and lucide-react icons underneath, before hand-rolling controls.
