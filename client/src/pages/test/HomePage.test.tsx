@@ -61,6 +61,7 @@ describe("HomePage", () => {
     render(<HomePage />);
 
     expect(screen.getByRole("heading", { name: "New run" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Randomizer/ })).toBeInTheDocument();
     expect(screen.getByText("Heartgold w/ Sam")).toBeInTheDocument();
     expect(screen.getByText("soullink")).toBeInTheDocument();
     expect(screen.getByText("RNG")).toBeInTheDocument();
@@ -91,6 +92,33 @@ describe("HomePage", () => {
     });
     expect(toastMock.success).toHaveBeenCalledWith("Run created", {
       description: "Emerald solo is ready.",
+    });
+  });
+
+  it("submits solo randomizer mode as a randomized nuzlocke run", async () => {
+    const user = userEvent.setup();
+    createRunMock.mockResolvedValueOnce({
+      ...run,
+      challenge_mode: "nuzlocke",
+      is_randomizer: true,
+      name: "Emerald randomizer",
+    });
+
+    render(<HomePage />);
+
+    await user.clear(screen.getByLabelText("Run name"));
+    await user.type(screen.getByLabelText("Run name"), "Emerald randomizer");
+    await user.click(screen.getByRole("radio", { name: /Randomizer/ }));
+    await user.click(screen.getByRole("button", { name: "Create run" }));
+
+    await waitFor(() => {
+      expect(createRunMock).toHaveBeenCalledWith({
+        challenge_mode: "nuzlocke",
+        game_version_ref: "emerald",
+        is_randomizer: true,
+        name: "Emerald randomizer",
+        notes: null,
+      });
     });
   });
 

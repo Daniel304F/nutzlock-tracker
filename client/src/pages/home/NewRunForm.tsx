@@ -1,4 +1,4 @@
-import { Plus, Shuffle, User, Users } from "lucide-react";
+import { Plus, Shuffle, User, Users, type LucideIcon } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
 import type { ChallengeMode, RunCreateInput, RunResponse } from "@api/runs";
@@ -7,12 +7,20 @@ type NewRunFormProps = {
   onCreateRun: (input: RunCreateInput) => Promise<RunResponse>;
 };
 
-const challengeModes = [
+type RunSetupMode = ChallengeMode | "randomizer";
+
+const runSetupModes = [
   {
     description: "Solo tracker",
     icon: User,
     label: "Nuzlocke",
     value: "nuzlocke",
+  },
+  {
+    description: "Solo RNG",
+    icon: Shuffle,
+    label: "Randomizer",
+    value: "randomizer",
   },
   {
     description: "Shared room",
@@ -22,9 +30,9 @@ const challengeModes = [
   },
 ] as const satisfies ReadonlyArray<{
   description: string;
-  icon: typeof User;
+  icon: LucideIcon;
   label: string;
-  value: ChallengeMode;
+  value: RunSetupMode;
 }>;
 
 function getFormText(formData: FormData, key: string): string {
@@ -32,35 +40,37 @@ function getFormText(formData: FormData, key: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function buildRunInput(formData: FormData, challengeMode: ChallengeMode, isRandomizer: boolean) {
+function toChallengeMode(setupMode: RunSetupMode): ChallengeMode {
+  return setupMode === "soullink" ? "soullink" : "nuzlocke";
+}
+
+function buildRunInput(formData: FormData, setupMode: RunSetupMode) {
   const notes = getFormText(formData, "notes");
 
   return {
-    challenge_mode: challengeMode,
+    challenge_mode: toChallengeMode(setupMode),
     game_version_ref: getFormText(formData, "game_version_ref"),
-    is_randomizer: isRandomizer,
+    is_randomizer: setupMode === "randomizer",
     name: getFormText(formData, "name"),
     notes: notes || null,
   } satisfies RunCreateInput;
 }
 
 export function NewRunForm({ onCreateRun }: NewRunFormProps) {
-  const [challengeMode, setChallengeMode] = useState<ChallengeMode>("nuzlocke");
-  const [isRandomizer, setIsRandomizer] = useState(false);
+  const [setupMode, setSetupMode] = useState<RunSetupMode>("nuzlocke");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const input = buildRunInput(new FormData(form), challengeMode, isRandomizer);
+    const input = buildRunInput(new FormData(form), setupMode);
 
     setIsSubmitting(true);
 
     try {
       await onCreateRun(input);
       form.reset();
-      setChallengeMode("nuzlocke");
-      setIsRandomizer(false);
+      setSetupMode("nuzlocke");
     } finally {
       setIsSubmitting(false);
     }
@@ -92,10 +102,10 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
 
         <fieldset>
           <legend className="text-sm font-medium text-zinc-800">Mode</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            {challengeModes.map((mode) => {
+          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+            {runSetupModes.map((mode) => {
               const Icon = mode.icon;
-              const isSelected = challengeMode === mode.value;
+              const isSelected = setupMode === mode.value;
 
               return (
                 <label
@@ -109,10 +119,10 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
                   <input
                     checked={isSelected}
                     className="sr-only"
-                    name="challenge_mode"
+                    name="run_setup_mode"
                     type="radio"
                     value={mode.value}
-                    onChange={() => setChallengeMode(mode.value)}
+                    onChange={() => setSetupMode(mode.value)}
                   />
                   <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
                   <span>
@@ -133,20 +143,6 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
             name="game_version_ref"
             required
             type="text"
-          />
-        </label>
-
-        <label className="flex min-h-11 items-center justify-between gap-3 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm">
-          <span className="inline-flex items-center gap-2 font-medium text-zinc-800">
-            <Shuffle aria-hidden="true" className="h-4 w-4 text-violet-700" />
-            Randomizer
-          </span>
-          <input
-            checked={isRandomizer}
-            className="h-5 w-5 accent-emerald-700"
-            name="is_randomizer"
-            type="checkbox"
-            onChange={(event) => setIsRandomizer(event.currentTarget.checked)}
           />
         </label>
 
