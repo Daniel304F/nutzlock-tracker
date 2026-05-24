@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       "@api": fileURLToPath(new URL("./src/api", import.meta.url)),
       "@assets": fileURLToPath(new URL("./src/assets", import.meta.url)),
+      "@components": fileURLToPath(new URL("./src/components", import.meta.url)),
       "@contexts": fileURLToPath(new URL("./src/contexts", import.meta.url)),
       "@hooks": fileURLToPath(new URL("./src/hooks", import.meta.url)),
       "@layout": fileURLToPath(new URL("./src/layout", import.meta.url)),

@@ -13,6 +13,7 @@
     "paths": {
       "@api/*": ["./src/api/*"],
       "@assets/*": ["./src/assets/*"],
+      "@components/*": ["./src/components/*"],
       "@contexts/*": ["./src/contexts/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@layout/*": ["./src/layout/*"],
