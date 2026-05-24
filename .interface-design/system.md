@@ -77,3 +77,18 @@ Status treatment:
 - Box: violet mark plus text.
 - Death/graveyard: rose mark plus text.
 - Rule warning: amber mark plus direct explanation.
+
+Overlays:
+
+- Use the global `ModalProvider` for app-wide dialogs instead of local modal state when a flow needs confirmation from multiple features.
+- Dialogs use Radix Dialog, an understated zinc overlay, 8px radius, a white elevated surface, border separation, and a compact title/description header.
+- Destructive or irreversible actions, especially death, delete, archive, and propagation-related actions, should use the modal service `confirm` flow.
+- Primary modal actions map to semantic intent: emerald for default, amber for warning, rose for danger/death.
+- Mobile dialogs must fit within `100dvh`, keep actions reachable at the bottom, and stack actions vertically when space is narrow.
+
+Toasts:
+
+- Use the global `ToastProvider` and typed toast service for transient feedback after saves, sync events, imports, API errors, and rule warnings.
+- Toasts appear top-right on desktop and use semantic borders/colors: emerald success, sky info, amber warning, rose error.
+- Toast copy should be short and action-oriented, with optional description for context. Do not use toasts for decisions that require user confirmation.
+- Default duration is brief enough for play-session rhythm; persistent or destructive choices belong in a modal.
