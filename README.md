@@ -47,6 +47,20 @@ python -m uv run uvicorn nutzlock_tracker.main:app --reload
 
 Default API docs: `http://localhost:8000/api/v1/docs`
 
+On Windows, the backend dev helper wraps the same startup flow and picks the
+next free port if `8000` is already busy:
+
+```powershell
+cd server
+.\start-dev.ps1
+```
+
+Use a fixed port when needed:
+
+```powershell
+.\start-dev.ps1 -Port 8002 -StrictPort
+```
+
 ## Verification
 
 ```shell
