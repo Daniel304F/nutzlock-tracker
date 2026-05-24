@@ -1,16 +1,25 @@
 from collections.abc import AsyncIterator
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from nutzlock_tracker.database import Base, get_db
 from nutzlock_tracker.main import create_app
+from nutzlock_tracker.rules.models import Ruleset
+
+
+@dataclass(frozen=True)
+class ApiHarness:
+    client: AsyncClient
+    session_factory: async_sessionmaker[AsyncSession]
 
 
 @pytest.fixture
-async def client(tmp_path: Path) -> AsyncIterator[AsyncClient]:
+async def harness(tmp_path: Path) -> AsyncIterator[ApiHarness]:
     app = create_app(init_database=False)
     database_url = f"sqlite+aiosqlite:///{tmp_path / 'runs-test.db'}"
     engine = create_async_engine(database_url)
@@ -29,7 +38,7 @@ async def client(tmp_path: Path) -> AsyncIterator[AsyncClient]:
         transport=ASGITransport(app=app),
         base_url="http://test",
     ) as test_client:
-        yield test_client
+        yield ApiHarness(client=test_client, session_factory=session_factory)
 
     await engine.dispose()
 
@@ -51,8 +60,8 @@ async def create_run(test_client: AsyncClient, name: str = "Heartgold w/ Sam") -
 
 
 @pytest.mark.asyncio
-async def test_create_run_persists_core_fields(client: AsyncClient) -> None:
-    run = await create_run(client)
+async def test_create_run_persists_core_fields(harness: ApiHarness) -> None:
+    run = await create_run(harness.client)
 
     assert run["id"]
     assert run["name"] == "Heartgold w/ Sam"
@@ -68,19 +77,46 @@ async def test_create_run_persists_core_fields(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_list_runs_returns_newest_first(client: AsyncClient) -> None:
-    first = await create_run(client, "First run")
-    second = await create_run(client, "Second run")
+async def test_create_run_persists_default_ruleset(harness: ApiHarness) -> None:
+    run = await create_run(harness.client)
 
-    response = await client.get("/api/v1/runs")
+    async with harness.session_factory() as session:
+        ruleset = await session.scalar(
+            select(Ruleset).where(Ruleset.id == run["ruleset_id"]),
+        )
+
+    assert ruleset is not None
+    assert ruleset.run_id == run["id"]
+    assert ruleset.standard_rules == "standard_nuzlocke"
+    assert ruleset.clauses == {
+        "dupes": True,
+        "gift_static_counts": True,
+        "nickname": True,
+        "no_battle_items": False,
+        "set_battle_style": "set",
+        "shiny": True,
+        "species": False,
+    }
+    assert ruleset.custom_rules == []
+    assert ruleset.level_cap_enabled is True
+    assert ruleset.level_cap_source == "milestone"
+    assert ruleset.death_propagation_mode == "full_link"
+
+
+@pytest.mark.asyncio
+async def test_list_runs_returns_newest_first(harness: ApiHarness) -> None:
+    first = await create_run(harness.client, "First run")
+    second = await create_run(harness.client, "Second run")
+
+    response = await harness.client.get("/api/v1/runs")
 
     assert response.status_code == 200
     assert [run["id"] for run in response.json()] == [second["id"], first["id"]]
 
 
 @pytest.mark.asyncio
-async def test_create_run_rejects_blank_name(client: AsyncClient) -> None:
-    response = await client.post(
+async def test_create_run_rejects_blank_name(harness: ApiHarness) -> None:
+    response = await harness.client.post(
         "/api/v1/runs",
         json={
             "challenge_mode": "nuzlocke",
