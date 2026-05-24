@@ -34,6 +34,7 @@ const run = {
   is_randomizer: true,
   name: "Heartgold w/ Sam",
   notes: "Shared route.",
+  player_count: 2,
   randomizer_config_id: null,
   room_id: null,
   ruleset_id: "ruleset-1",
@@ -88,6 +89,7 @@ describe("HomePage", () => {
         is_randomizer: false,
         name: "Emerald solo",
         notes: "First clear attempt.",
+        player_count: 1,
       });
     });
     expect(toastMock.success).toHaveBeenCalledWith("Run created", {
@@ -118,6 +120,41 @@ describe("HomePage", () => {
         is_randomizer: true,
         name: "Emerald randomizer",
         notes: null,
+        player_count: 1,
+      });
+    });
+  });
+
+  it("submits a multiplayer soullink run with the chosen player count", async () => {
+    const user = userEvent.setup();
+    createRunMock.mockResolvedValueOnce({
+      ...run,
+      challenge_mode: "soullink",
+      is_randomizer: false,
+      name: "Quad soullink",
+      player_count: 4,
+    });
+
+    render(<HomePage />);
+
+    await user.clear(screen.getByLabelText("Run name"));
+    await user.type(screen.getByLabelText("Run name"), "Quad soullink");
+    await user.click(screen.getByRole("radio", { name: /Mehrspieler/ }));
+
+    const countInput = screen.getByLabelText("Anzahl Spieler");
+    await user.clear(countInput);
+    await user.type(countInput, "4");
+
+    await user.click(screen.getByRole("button", { name: "Create run" }));
+
+    await waitFor(() => {
+      expect(createRunMock).toHaveBeenCalledWith({
+        challenge_mode: "soullink",
+        game_version_ref: "emerald",
+        is_randomizer: false,
+        name: "Quad soullink",
+        notes: null,
+        player_count: 4,
       });
     });
   });

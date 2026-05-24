@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, String, Text
+from sqlalchemy import Boolean, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nutzlock_tracker.database import Base
@@ -12,6 +12,7 @@ class Run(Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     challenge_mode: Mapped[str] = mapped_column(String(16), nullable=False)
     is_randomizer: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    player_count: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     game_version_ref: Mapped[str] = mapped_column(String(80), nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="active")
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)

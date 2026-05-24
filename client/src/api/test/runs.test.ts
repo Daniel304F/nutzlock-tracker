@@ -20,6 +20,7 @@ const runResponse: RunResponse = {
   is_randomizer: false,
   name: "Emerald solo",
   notes: null,
+  player_count: 1,
   randomizer_config_id: null,
   room_id: null,
   ruleset_id: "ruleset-1",
@@ -48,6 +49,7 @@ describe("runsApi", () => {
       is_randomizer: true,
       name: "Heartgold w/ Sam",
       notes: "Shared attempt.",
+      player_count: 2,
     };
     mockedApiClient.post.mockResolvedValueOnce({ data: { ...runResponse, ...input } });
 

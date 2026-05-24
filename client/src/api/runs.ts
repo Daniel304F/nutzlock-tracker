@@ -10,6 +10,7 @@ export type RunCreateInput = {
   is_randomizer: boolean;
   name: string;
   notes?: string | null;
+  player_count: number;
 };
 
 export type RunResponse = {
@@ -20,6 +21,7 @@ export type RunResponse = {
   is_randomizer: boolean;
   name: string;
   notes: string | null;
+  player_count: number;
   randomizer_config_id: string | null;
   room_id: string | null;
   ruleset_id: string;

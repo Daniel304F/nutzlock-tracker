@@ -23,7 +23,7 @@ Read these first:
 
 ## Repository Layout
 
-- `client/`: React 19 SPA with Tailwind 3.
+- `client/`: React 19 SPA with Tailwind CSS 4 and shadcn/ui.
 - `server/`: FastAPI backend managed with uv. Do not add `requirements.txt`.
 - `docs/`: project requirements, architecture notes, and agent setup.
 - `.interface-design/`: persistent interface design memory for future UI work.
@@ -37,6 +37,7 @@ Read these first:
 - Read `docs/WIREFRAMES.md` and inspect `docs/wireframes.pdf` before page-level UI or layout work.
 - Keep changes scoped and update the relevant docs when a convention changes.
 - Use installed project skills from `.agents/skills/` when their scope matches the task.
+- Prefer established UI libraries for the web interface. Use shadcn/ui primitives from `client/src/components/ui/` first, with Radix UI behavior and lucide-react icons underneath, before hand-rolling controls.
 - Prefer typed boundaries: TypeScript types in the client, Pydantic schemas in the API.
 - Keep domain logic out of UI components and route handlers.
 - Add or update tests for shared logic, API behavior, and rule validation.

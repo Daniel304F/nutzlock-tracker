@@ -1,6 +1,6 @@
 # Frontend Agent Guide
 
-This is a React 19 + Vite + TypeScript + Tailwind 3 app.
+This is a React 19 + Vite + TypeScript + Tailwind CSS 4 app using shadcn/ui.
 
 Also read:
 
@@ -56,6 +56,7 @@ Also read:
 - `src/utils`: framework-light utilities.
 - `src/assets`: static assets imported by the app.
 - Shared UI components should go in `src/components`.
+- Prefer shadcn/ui primitives from `src/components/ui/` for reusable controls and compose them with Radix UI behavior, lucide-react icons, and the `cn()` helper before hand-rolling UI.
 - Feature code should be grouped by feature once it grows beyond a single file.
 - Keep environment-specific API URLs in `.env` via `VITE_API_URL`.
 - Use path aliases such as `@api/health` and `@layout/AppShell` instead of long relative imports.

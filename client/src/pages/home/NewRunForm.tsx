@@ -1,4 +1,4 @@
-import { Plus, Shuffle, User, Users, type LucideIcon } from "lucide-react";
+import { Dice5, Plus, Shuffle, User, Users, UsersRound, type LucideIcon } from "lucide-react";
 import { useId, useState, type FormEvent } from "react";
 
 import type { ChallengeMode, RunCreateInput, RunResponse } from "@api/runs";
@@ -14,73 +14,181 @@ type NewRunFormProps = {
   onCreateRun: (input: RunCreateInput) => Promise<RunResponse>;
 };
 
-type RunSetupMode = ChallengeMode | "randomizer";
+type PlayerKind = "solo" | "duo" | "multi";
+type RunMode = "nuzlocke" | "randomizer";
 
-const runSetupModes = [
+const DEFAULT_MULTI_PLAYER_COUNT = 3;
+const MAX_PLAYER_COUNT = 32;
+
+type RadioOption<T extends string> = {
+  description: string;
+  icon: LucideIcon;
+  label: string;
+  value: T;
+};
+
+const playerKinds = [
   {
-    description: "Solo tracker",
+    description: "Solo-Lauf",
     icon: User,
+    label: "Einzelspieler",
+    value: "solo",
+  },
+  {
+    description: "Zwei Spieler",
+    icon: Users,
+    label: "Duo",
+    value: "duo",
+  },
+  {
+    description: "Drei oder mehr",
+    icon: UsersRound,
+    label: "Mehrspieler",
+    value: "multi",
+  },
+] as const satisfies ReadonlyArray<RadioOption<PlayerKind>>;
+
+const runModes = [
+  {
+    description: "Standard-Regeln",
+    icon: Dice5,
     label: "Nuzlocke",
     value: "nuzlocke",
   },
   {
-    description: "Solo RNG",
+    description: "Zufaellige Begegnungen",
     icon: Shuffle,
     label: "Randomizer",
     value: "randomizer",
   },
-  {
-    description: "Shared room",
-    icon: Users,
-    label: "Soullink",
-    value: "soullink",
-  },
-] as const satisfies ReadonlyArray<{
-  description: string;
-  icon: LucideIcon;
-  label: string;
-  value: RunSetupMode;
-}>;
+] as const satisfies ReadonlyArray<RadioOption<RunMode>>;
 
 function getFormText(formData: FormData, key: string): string {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
 }
 
-function toChallengeMode(setupMode: RunSetupMode): ChallengeMode {
-  return setupMode === "soullink" ? "soullink" : "nuzlocke";
+function toChallengeMode(playerKind: PlayerKind): ChallengeMode {
+  return playerKind === "solo" ? "nuzlocke" : "soullink";
 }
 
-function buildRunInput(formData: FormData, setupMode: RunSetupMode) {
+function resolvePlayerCount(playerKind: PlayerKind, multiCount: number): number {
+  if (playerKind === "solo") return 1;
+  if (playerKind === "duo") return 2;
+  return multiCount;
+}
+
+function buildRunInput(
+  formData: FormData,
+  playerKind: PlayerKind,
+  runMode: RunMode,
+  multiCount: number,
+): RunCreateInput {
   const notes = getFormText(formData, "notes");
 
   return {
-    challenge_mode: toChallengeMode(setupMode),
+    challenge_mode: toChallengeMode(playerKind),
     game_version_ref: getFormText(formData, "game_version_ref"),
-    is_randomizer: setupMode === "randomizer",
+    is_randomizer: runMode === "randomizer",
     name: getFormText(formData, "name"),
     notes: notes || null,
-  } satisfies RunCreateInput;
+    player_count: resolvePlayerCount(playerKind, multiCount),
+  };
+}
+
+type RadioCardGroupProps<T extends string> = {
+  ariaLabel: string;
+  baseId: string;
+  className?: string;
+  name: string;
+  onChange: (value: T) => void;
+  options: ReadonlyArray<RadioOption<T>>;
+  value: T;
+};
+
+function RadioCardGroup<T extends string>({
+  ariaLabel,
+  baseId,
+  className,
+  name,
+  onChange,
+  options,
+  value,
+}: RadioCardGroupProps<T>) {
+  return (
+    <RadioGroup
+      aria-label={ariaLabel}
+      className={cn("mt-2 grid gap-2", className)}
+      name={name}
+      value={value}
+      onValueChange={(next) => onChange(next as T)}
+    >
+      {options.map((option) => {
+        const Icon = option.icon;
+        const isSelected = value === option.value;
+        const itemId = `${baseId}-${option.value}`;
+
+        return (
+          <Label
+            htmlFor={itemId}
+            key={option.value}
+            className={cn(
+              "flex min-h-16 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
+              isSelected
+                ? "border-emerald-600 bg-emerald-50 text-emerald-900"
+                : "border-border bg-card text-foreground hover:bg-secondary",
+            )}
+          >
+            <RadioGroupItem
+              aria-label={option.label}
+              className="sr-only"
+              id={itemId}
+              value={option.value}
+            />
+            <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
+            <span>
+              <span className="block font-semibold">{option.label}</span>
+              <span className="block text-xs text-muted-foreground">
+                {option.description}
+              </span>
+            </span>
+          </Label>
+        );
+      })}
+    </RadioGroup>
+  );
 }
 
 export function NewRunForm({ onCreateRun }: NewRunFormProps) {
-  const [setupMode, setSetupMode] = useState<RunSetupMode>("nuzlocke");
+  const [playerKind, setPlayerKind] = useState<PlayerKind>("solo");
+  const [runMode, setRunMode] = useState<RunMode>("nuzlocke");
+  const [multiPlayerCount, setMultiPlayerCount] = useState<number>(DEFAULT_MULTI_PLAYER_COUNT);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nameId = useId();
   const editionId = useId();
   const notesId = useId();
+  const playerKindId = useId();
+  const runModeId = useId();
+  const multiCountId = useId();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const input = buildRunInput(new FormData(form), setupMode);
+    const input = buildRunInput(
+      new FormData(form),
+      playerKind,
+      runMode,
+      multiPlayerCount,
+    );
 
     setIsSubmitting(true);
 
     try {
       await onCreateRun(input);
       form.reset();
-      setSetupMode("nuzlocke");
+      setPlayerKind("solo");
+      setRunMode("nuzlocke");
+      setMultiPlayerCount(DEFAULT_MULTI_PLAYER_COUNT);
     } finally {
       setIsSubmitting(false);
     }
@@ -115,46 +223,49 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
           </div>
 
           <fieldset>
-            <legend className="text-sm font-medium text-foreground">Mode</legend>
-            <RadioGroup
-              className="mt-2 grid gap-2 sm:grid-cols-3"
-              name="run_setup_mode"
-              value={setupMode}
-              onValueChange={(value) => setSetupMode(value as RunSetupMode)}
-            >
-              {runSetupModes.map((mode) => {
-                const Icon = mode.icon;
-                const isSelected = setupMode === mode.value;
-                const itemId = `${nameId}-mode-${mode.value}`;
+            <legend className="text-sm font-medium text-foreground">Spielertyp</legend>
+            <RadioCardGroup
+              ariaLabel="Spielertyp"
+              baseId={playerKindId}
+              className="sm:grid-cols-3"
+              name="player_kind"
+              onChange={setPlayerKind}
+              options={playerKinds}
+              value={playerKind}
+            />
+            {playerKind === "multi" ? (
+              <div className="mt-3 space-y-1.5">
+                <Label htmlFor={multiCountId}>Anzahl Spieler</Label>
+                <Input
+                  className="min-h-11 bg-secondary"
+                  id={multiCountId}
+                  inputMode="numeric"
+                  max={MAX_PLAYER_COUNT}
+                  min={3}
+                  name="player_count_input"
+                  required
+                  type="number"
+                  value={multiPlayerCount}
+                  onChange={(event) => {
+                    const next = Number(event.currentTarget.value);
+                    setMultiPlayerCount(Number.isFinite(next) ? next : DEFAULT_MULTI_PLAYER_COUNT);
+                  }}
+                />
+              </div>
+            ) : null}
+          </fieldset>
 
-                return (
-                  <Label
-                    htmlFor={itemId}
-                    key={mode.value}
-                    className={cn(
-                      "flex min-h-16 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
-                      isSelected
-                        ? "border-emerald-600 bg-emerald-50 text-emerald-900"
-                        : "border-border bg-card text-foreground hover:bg-secondary",
-                    )}
-                  >
-                    <RadioGroupItem
-                      aria-label={mode.label}
-                      className="sr-only"
-                      id={itemId}
-                      value={mode.value}
-                    />
-                    <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
-                    <span>
-                      <span className="block font-semibold">{mode.label}</span>
-                      <span className="block text-xs text-muted-foreground">
-                        {mode.description}
-                      </span>
-                    </span>
-                  </Label>
-                );
-              })}
-            </RadioGroup>
+          <fieldset>
+            <legend className="text-sm font-medium text-foreground">Modus</legend>
+            <RadioCardGroup
+              ariaLabel="Modus"
+              baseId={runModeId}
+              className="sm:grid-cols-2"
+              name="run_mode"
+              onChange={setRunMode}
+              options={runModes}
+              value={runMode}
+            />
           </fieldset>
 
           <div className="space-y-1.5">

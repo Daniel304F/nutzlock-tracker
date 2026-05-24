@@ -17,6 +17,7 @@ async def create_run(session: AsyncSession, payload: RunCreate) -> Run:
         is_randomizer=payload.is_randomizer,
         name=payload.name,
         notes=payload.notes,
+        player_count=payload.player_count,
         ruleset_id=ruleset_id,
     )
     ruleset = build_default_ruleset(run_id=run_id, ruleset_id=ruleset_id)

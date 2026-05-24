@@ -7,7 +7,7 @@ The first project phase is intentionally focused on agent-friendly structure:
 - `AGENTS.md` gives AI coding agents the shared project rules.
 - `docs/ENTITIES.md` gives agents the canonical domain entity reference.
 - `docs/WIREFRAMES.md` and `docs/wireframes.pdf` give agents the layout and workflow reference.
-- `client/AGENTS.md` adds React 19 + Tailwind 3 rules.
+- `client/AGENTS.md` adds React 19 + Tailwind CSS 4 + shadcn/ui rules.
 - `server/AGENTS.md` adds FastAPI + uv + SQLite rules.
 - `.agents/skills/` contains installed external project skills.
 - `.interface-design/system.md` stores reusable UI decisions.
@@ -15,7 +15,7 @@ The first project phase is intentionally focused on agent-friendly structure:
 
 ## Stack
 
-- Frontend: React 19, Vite, TypeScript, Tailwind CSS 3
+- Frontend: React 19, Vite, TypeScript, Tailwind CSS 4, shadcn/ui
 - Backend: FastAPI, Python 3.12, uv, SQLite
 - Realtime target: WebSockets or SSE in a later step
 

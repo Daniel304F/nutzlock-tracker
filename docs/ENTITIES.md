@@ -22,6 +22,7 @@ A concrete Nuzlocke or Soullink playthrough.
 | `name` | string | User-facing run name. |
 | `challenge_mode` | enum | `nuzlocke` or `soullink`. |
 | `is_randomizer` | boolean | Randomizer is orthogonal to challenge mode. |
+| `player_count` | int | Number of players. `1` for solo nuzlocke, `2` for duo soullink, `>=3` for multi-player soullink. |
 | `game_version_ref` | string | Reference key for edition/version. |
 | `status` | enum | `active`, `completed_victory`, `failed_wipeout`, `archived`. |
 | `notes` | string? | Free-form notes. |

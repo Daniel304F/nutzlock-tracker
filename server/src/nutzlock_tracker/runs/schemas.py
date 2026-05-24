@@ -24,6 +24,7 @@ class RunCreate(BaseModel):
     is_randomizer: bool = False
     name: str = Field(min_length=1, max_length=120)
     notes: str | None = Field(default=None, max_length=2_000)
+    player_count: int = Field(default=1, ge=1, le=32)
 
     @field_validator("name", "game_version_ref")
     @classmethod
@@ -52,6 +53,7 @@ class RunResponse(BaseModel):
     is_randomizer: bool
     name: str
     notes: str | None
+    player_count: int
     randomizer_config_id: str | None
     room_id: str | None
     ruleset_id: str

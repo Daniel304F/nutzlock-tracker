@@ -52,6 +52,7 @@ async def create_run(test_client: AsyncClient, name: str = "Heartgold w/ Sam") -
             "is_randomizer": True,
             "name": name,
             "notes": "First shared run.",
+            "player_count": 2,
         },
     )
 
@@ -67,6 +68,7 @@ async def test_create_run_persists_core_fields(harness: ApiHarness) -> None:
     assert run["name"] == "Heartgold w/ Sam"
     assert run["challenge_mode"] == "soullink"
     assert run["is_randomizer"] is True
+    assert run["player_count"] == 2
     assert run["game_version_ref"] == "heartgold"
     assert run["status"] == "active"
     assert run["ruleset_id"]
@@ -123,6 +125,38 @@ async def test_create_run_rejects_blank_name(harness: ApiHarness) -> None:
             "game_version_ref": "emerald",
             "is_randomizer": False,
             "name": "   ",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_run_defaults_player_count_to_one(harness: ApiHarness) -> None:
+    response = await harness.client.post(
+        "/api/v1/runs",
+        json={
+            "challenge_mode": "nuzlocke",
+            "game_version_ref": "emerald",
+            "is_randomizer": False,
+            "name": "Emerald solo",
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json()["player_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_create_run_rejects_zero_player_count(harness: ApiHarness) -> None:
+    response = await harness.client.post(
+        "/api/v1/runs",
+        json={
+            "challenge_mode": "soullink",
+            "game_version_ref": "heartgold",
+            "is_randomizer": False,
+            "name": "Bad run",
+            "player_count": 0,
         },
     )
 
