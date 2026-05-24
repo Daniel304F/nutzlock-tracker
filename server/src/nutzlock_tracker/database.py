@@ -18,6 +18,7 @@ class Base(DeclarativeBase):
 
 async def init_db() -> None:
     import_module("nutzlock_tracker.runs.models")
+    import_module("nutzlock_tracker.rules.models")
 
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
