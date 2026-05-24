@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { ModalProvider } from "@components/modal/ModalProvider";
+import { ThemeProvider } from "@components/theme/ThemeProvider";
 import { ToastProvider } from "@components/toast/ToastProvider";
 
 type AppProvidersProps = {
@@ -9,8 +10,10 @@ type AppProvidersProps = {
 
 export function AppProviders({ children }: AppProvidersProps) {
   return (
-    <ToastProvider>
-      <ModalProvider>{children}</ModalProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <ModalProvider>{children}</ModalProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }

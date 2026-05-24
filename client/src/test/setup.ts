@@ -11,6 +11,20 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 }
 
 if (typeof window !== "undefined" && typeof window.HTMLElement !== "undefined") {
+  if (typeof window.matchMedia !== "function") {
+    window.matchMedia = (query) =>
+      ({
+        addEventListener: () => {},
+        addListener: () => {},
+        dispatchEvent: () => false,
+        matches: false,
+        media: query,
+        onchange: null,
+        removeEventListener: () => {},
+        removeListener: () => {},
+      }) as MediaQueryList;
+  }
+
   const proto = window.HTMLElement.prototype;
 
   if (typeof proto.hasPointerCapture !== "function") {

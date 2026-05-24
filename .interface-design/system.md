@@ -59,6 +59,7 @@ App shell:
 - Primary navigation should remain predictable on desktop and mobile.
 - Do not hide core actions behind hover-only affordances.
 - Keep the theme toggle visible in the global header.
+- Keep a compact footer in the global shell with brand continuity and restrained stack/status badges.
 
 Home workspace:
 

@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ThemeProvider } from "@components/theme/ThemeProvider";
 import { HomePage } from "@pages/HomePage";
 
 const toastMock = vi.hoisted(() => ({
@@ -42,6 +43,14 @@ const run = {
   updated_at: "2026-05-24T17:00:00Z",
 } as const;
 
+function renderHomePage() {
+  return render(
+    <ThemeProvider>
+      <HomePage />
+    </ThemeProvider>,
+  );
+}
+
 describe("HomePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,20 +68,23 @@ describe("HomePage", () => {
   });
 
   it("renders run creation controls and recent runs", () => {
-    render(<HomePage />);
+    renderHomePage();
 
+    expect(screen.getByRole("button", { name: "Switch to dark mode" })).toBeInTheDocument();
+    expect(screen.queryByText(/Modern run command center/i)).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "New run" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Randomizer/ })).toBeInTheDocument();
     expect(screen.getByText("Heartgold w/ Sam")).toBeInTheDocument();
     expect(screen.getByText("soullink")).toBeInTheDocument();
     expect(screen.getByText("RNG")).toBeInTheDocument();
+    expect(screen.getByRole("contentinfo")).toHaveTextContent("Nutzlock Tracker");
   });
 
   it("submits a new run and shows success feedback", async () => {
     const user = userEvent.setup();
     createRunMock.mockResolvedValueOnce({ ...run, name: "Emerald solo" });
 
-    render(<HomePage />);
+    renderHomePage();
 
     await user.clear(screen.getByLabelText("Run name"));
     await user.type(screen.getByLabelText("Run name"), "Emerald solo");
@@ -106,7 +118,7 @@ describe("HomePage", () => {
       name: "Emerald randomizer",
     });
 
-    render(<HomePage />);
+    renderHomePage();
 
     await user.clear(screen.getByLabelText("Run name"));
     await user.type(screen.getByLabelText("Run name"), "Emerald randomizer");
@@ -135,7 +147,7 @@ describe("HomePage", () => {
       player_count: 4,
     });
 
-    render(<HomePage />);
+    renderHomePage();
 
     await user.clear(screen.getByLabelText("Run name"));
     await user.type(screen.getByLabelText("Run name"), "Quad soullink");
@@ -168,7 +180,7 @@ describe("HomePage", () => {
       status: "error",
     });
 
-    render(<HomePage />);
+    renderHomePage();
 
     expect(screen.getByText("API offline")).toBeInTheDocument();
   });

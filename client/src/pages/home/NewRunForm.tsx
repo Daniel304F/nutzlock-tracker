@@ -133,10 +133,10 @@ function RadioCardGroup<T extends string>({
             htmlFor={itemId}
             key={option.value}
             className={cn(
-              "flex min-h-16 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
+              "flex min-h-16 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all hover:-translate-y-0.5",
               isSelected
-                ? "border-emerald-600 bg-emerald-50 text-emerald-900"
-                : "border-border bg-card text-foreground hover:bg-secondary",
+                ? "border-primary bg-primary/10 text-foreground shadow-sm ring-1 ring-primary/20"
+                : "border-border/80 bg-background/60 text-foreground hover:border-primary/40 hover:bg-secondary/80",
             )}
           >
             <RadioGroupItem
@@ -145,7 +145,15 @@ function RadioCardGroup<T extends string>({
               id={itemId}
               value={option.value}
             />
-            <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
+            <span
+              aria-hidden="true"
+              className={cn(
+                "inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border/70 bg-card text-muted-foreground",
+                isSelected && "border-primary/30 bg-primary text-primary-foreground",
+              )}
+            >
+              <Icon className="size-4" />
+            </span>
             <span>
               <span className="block font-semibold">{option.label}</span>
               <span className="block text-xs text-muted-foreground">
@@ -195,16 +203,23 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
   }
 
   return (
-    <Card className="gap-5 rounded-lg p-5">
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
-            <Plus aria-hidden="true" className="h-5 w-5" />
+    <Card className="overflow-hidden rounded-lg border-border/80 bg-card/95 p-0 shadow-sm">
+      <div aria-hidden="true" className="grid h-1 grid-cols-3">
+        <span className="bg-hibiscus" />
+        <span className="bg-ruby" />
+        <span className="bg-neon" />
+      </div>
+
+      <form className="space-y-5 p-5" onSubmit={handleSubmit}>
+        <div className="flex items-start gap-3">
+          <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
+            <Plus aria-hidden="true" className="size-5" />
           </span>
-          <div>
-            <h2 className="text-base font-semibold text-foreground">New run</h2>
-            <p className="text-sm text-muted-foreground">
-              Basics first, rooms and rules next.
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-foreground">New run</h2>
+            <p className="text-sm leading-5 text-muted-foreground">
+              Choose the run shape now. Rooms, rules, and recovery can expand
+              from this object later.
             </p>
           </div>
         </div>
@@ -213,7 +228,7 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
           <div className="space-y-1.5">
             <Label htmlFor={nameId}>Run name</Label>
             <Input
-              className="min-h-11 bg-secondary"
+              className="min-h-11 bg-background/70"
               id={nameId}
               name="name"
               placeholder="Heartgold w/ Sam"
@@ -237,7 +252,7 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
               <div className="mt-3 space-y-1.5">
                 <Label htmlFor={multiCountId}>Anzahl Spieler</Label>
                 <Input
-                  className="min-h-11 bg-secondary"
+                  className="min-h-11 bg-background/70"
                   id={multiCountId}
                   inputMode="numeric"
                   max={MAX_PLAYER_COUNT}
@@ -271,7 +286,7 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
           <div className="space-y-1.5">
             <Label htmlFor={editionId}>Edition key</Label>
             <Input
-              className="min-h-11 bg-secondary"
+              className="min-h-11 bg-background/70"
               defaultValue="emerald"
               id={editionId}
               name="game_version_ref"
@@ -283,7 +298,7 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
           <div className="space-y-1.5">
             <Label htmlFor={notesId}>Notes</Label>
             <Textarea
-              className="min-h-20 bg-secondary"
+              className="min-h-20 bg-background/70"
               id={notesId}
               name="notes"
               placeholder="Seed, partner, route plan"
@@ -291,7 +306,7 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
           </div>
         </div>
 
-        <Button className="min-h-11 w-full" disabled={isSubmitting} type="submit">
+        <Button className="min-h-11 w-full shadow-sm" disabled={isSubmitting} type="submit">
           <Plus aria-hidden="true" />
           Create run
         </Button>

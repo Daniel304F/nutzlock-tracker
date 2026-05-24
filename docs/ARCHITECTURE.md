@@ -38,10 +38,6 @@ JSON export/import is a versioned serialization of the same domain model, not an
 
 React components should stay mostly presentational. Put API calls in `src/api`, cross-cutting helpers in `src/lib`, feature rules in feature modules, and reusable UI components in `src/components` once they exist.
 
-## Wireframe Reference
-
-Use `docs/WIREFRAMES.md` and `docs/wireframes.pdf` as the layout and workflow reference for page-level UI. The PDF is a flow and hierarchy guide, not a pixel-perfect design contract.
-
 ## Entity Reference
 
 Use `docs/ENTITIES.md` as the canonical domain reference before adding database tables, Pydantic schemas, TypeScript types, or UI state that represents run data.
