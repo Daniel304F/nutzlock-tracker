@@ -59,7 +59,7 @@ Also read:
 - Feature code should be grouped by feature once it grows beyond a single file.
 - Keep environment-specific API URLs in `.env` via `VITE_API_URL`.
 - Use path aliases such as `@api/health` and `@layout/AppShell` instead of long relative imports.
-- Keep component tests next to the source as `*.test.tsx`; keep pure TypeScript tests as `*.test.ts`.
+- Keep tests in a dedicated `test/` folder under the relevant source folder, such as `src/api/test/*.test.ts` or `src/components/modal/test/*.test.tsx`.
 - Test API modules by mocking the shared client or adapter, not by calling a live server.
 - Add a test for each new hook, utility, domain function, and non-trivial component behavior.
 
