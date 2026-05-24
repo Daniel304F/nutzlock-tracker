@@ -1,18 +1,8 @@
-from datetime import UTC, datetime
-from uuid import uuid4
-
 from sqlalchemy import Boolean, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nutzlock_tracker.database import Base
-
-
-def make_uuid() -> str:
-    return str(uuid4())
-
-
-def utc_timestamp() -> str:
-    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
+from nutzlock_tracker.model_utils import make_uuid, utc_timestamp
 
 
 class Run(Base):
