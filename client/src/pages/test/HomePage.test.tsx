@@ -70,6 +70,7 @@ describe("HomePage", () => {
   it("renders run creation controls and recent runs", () => {
     renderHomePage();
 
+    expect(screen.getAllByAltText("Nutzlocke and Soullink logo")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Switch to dark mode" })).toBeInTheDocument();
     expect(screen.queryByText(/Modern run command center/i)).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "New run" })).toBeInTheDocument();

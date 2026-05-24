@@ -55,16 +55,19 @@ Avoid a one-hue UI. Status colors must be paired with icons or labels, not color
 App shell:
 
 - Top-level app experience first, not a marketing landing page.
-- Use the palette rail and compact brand tile as the product signature.
+- Use a single semantic primary rail and compact brand tile as the product signature.
+- Avoid multi-color palette rails in the app chrome; `bg-primary` should adapt between light and dark mode.
 - Primary navigation should remain predictable on desktop and mobile.
 - Do not hide core actions behind hover-only affordances.
 - Keep the theme toggle visible in the global header.
-- Keep a compact footer in the global shell with brand continuity and restrained stack/status badges.
+- Keep a compact full-width footer in the global shell with brand continuity and restrained stack/status badges.
+- Desktop app surfaces should use a wider `104rem` shell before falling back to side margins.
 
 Home workspace:
 
 - Use a compact command-center hero, not a marketing hero.
 - Keep the run creation form prominent and sticky on wide screens.
+- On wide desktop, reserve a wider setup column around 440-460px and let the run workspace expand.
 - On mobile, stack hero, actions, recent runs, and setup without horizontal scrolling.
 - Preserve the run creation API object shape when restyling the form.
 

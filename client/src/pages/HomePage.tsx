@@ -71,12 +71,7 @@ const heroStats = [
 function WorkspaceHero({ stats }: { stats: WorkspaceStats }) {
   return (
     <section className="relative overflow-hidden rounded-lg border border-border/80 bg-card text-card-foreground shadow-sm">
-      <div aria-hidden="true" className="grid h-1.5 grid-cols-4">
-        <span className="bg-hibiscus" />
-        <span className="bg-ruby" />
-        <span className="bg-aura" />
-        <span className="bg-indigo" />
-      </div>
+      <div aria-hidden="true" className="h-1.5 bg-primary" />
 
       <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)] lg:p-7">
         <div className="min-w-0">
@@ -138,7 +133,7 @@ export function HomePage() {
 
   return (
     <AppShell apiLabel={getApiLabel(apiState)} apiStatus={apiState.status}>
-      <section className="grid flex-1 gap-5 py-5 xl:grid-cols-[minmax(0,1fr)_420px]">
+      <section className="grid flex-1 gap-5 py-5 xl:grid-cols-[minmax(0,1fr)_440px] 2xl:gap-6 2xl:grid-cols-[minmax(0,1fr)_460px]">
         <div className="min-w-0 space-y-5">
           <WorkspaceHero stats={workspaceStats} />
 

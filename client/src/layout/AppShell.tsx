@@ -13,9 +13,9 @@ type AppShellProps = {
 };
 
 const apiStatusColor = {
-  loading: "bg-neon",
-  offline: "bg-ruby",
-  online: "bg-hibiscus",
+  loading: "bg-primary",
+  offline: "bg-destructive",
+  online: "bg-primary",
 } as const;
 
 const navItems = [
@@ -28,28 +28,17 @@ const footerTags = ["React", "FastAPI", "shadcn/ui"] as const;
 
 export function AppShell({ apiLabel, apiStatus, children }: AppShellProps) {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <div aria-hidden="true" className="grid h-1.5 grid-cols-5">
-        <span className="bg-hibiscus" />
-        <span className="bg-ruby" />
-        <span className="bg-aura" />
-        <span className="bg-indigo" />
-        <span className="bg-neon" />
-      </div>
+    <main className="flex min-h-screen flex-col overflow-x-hidden bg-background text-foreground">
+      <div aria-hidden="true" className="h-1.5 bg-primary" />
 
-      <div className="mx-auto flex min-h-[calc(100vh-0.375rem)] w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[104rem] flex-1 flex-col px-4 py-4 sm:px-6 lg:px-8">
         <header className="sticky top-0 z-30 -mx-4 border-b border-border/70 bg-background/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-center gap-3">
               <div
                 aria-hidden="true"
-                className="grid size-11 shrink-0 grid-cols-2 overflow-hidden rounded-lg border border-border bg-card shadow-sm"
-              >
-                <span className="bg-hibiscus" />
-                <span className="bg-ruby" />
-                <span className="bg-aura" />
-                <span className="bg-indigo" />
-              </div>
+                className="size-11 shrink-0 rounded-lg border border-primary/25 bg-primary shadow-sm"
+              />
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-muted-foreground">
                   Nuzlocke & Soullink
@@ -100,38 +89,33 @@ export function AppShell({ apiLabel, apiStatus, children }: AppShellProps) {
         <Separator className="sr-only" />
 
         {children}
+      </div>
 
-        <footer
-          className="mt-auto border-t border-border/70 py-6 text-sm text-muted-foreground"
-          role="contentinfo"
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <div
-                aria-hidden="true"
-                className="grid size-9 shrink-0 grid-cols-2 overflow-hidden rounded-md border border-border bg-card"
-              >
-                <span className="bg-hibiscus" />
-                <span className="bg-ruby" />
-                <span className="bg-aura" />
-                <span className="bg-indigo" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-semibold text-foreground">Nutzlock Tracker</p>
-                <p className="truncate">Private fan tool for challenge runs.</p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {footerTags.map((tag) => (
-                <Badge className="rounded-md px-2.5 py-1" key={tag} variant="outline">
-                  {tag}
-                </Badge>
-              ))}
+      <footer
+        className="w-full border-t border-border/70 bg-card/45 text-sm text-muted-foreground"
+        role="contentinfo"
+      >
+        <div className="mx-auto flex w-full max-w-[104rem] flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              aria-hidden="true"
+              className="size-9 shrink-0 rounded-md border border-primary/25 bg-primary"
+            />
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground">Nutzlock Tracker</p>
+              <p className="truncate">Private fan tool for challenge runs.</p>
             </div>
           </div>
-        </footer>
-      </div>
+
+          <div className="flex flex-wrap gap-2">
+            {footerTags.map((tag) => (
+              <Badge className="rounded-md px-2.5 py-1" key={tag} variant="outline">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

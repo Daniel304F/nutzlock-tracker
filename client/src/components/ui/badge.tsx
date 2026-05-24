@@ -20,12 +20,12 @@ const badgeVariants = cva(
         link: "text-primary underline-offset-4 [a&]:hover:underline",
         emerald:
           "border-neon/40 bg-neon/15 text-nocturne dark:text-neon [a&]:hover:bg-neon/25",
-        sky: "border-indigo/30 bg-indigo/10 text-indigo dark:border-neon/30 dark:bg-indigo/20 dark:text-neon [a&]:hover:bg-indigo/15",
+        sky: "border-indigo/30 bg-indigo/10 text-indigo dark:border-primary/35 dark:bg-primary/10 dark:text-primary [a&]:hover:bg-indigo/15",
         violet:
-          "border-hibiscus/30 bg-hibiscus/10 text-aura dark:text-hibiscus [a&]:hover:bg-hibiscus/15",
+          "border-hibiscus/30 bg-hibiscus/10 text-aura dark:border-primary/35 dark:bg-primary/10 dark:text-primary [a&]:hover:bg-hibiscus/15",
         amber:
           "border-neon/40 bg-neon/20 text-nocturne dark:text-neon [a&]:hover:bg-neon/30",
-        rose: "border-ruby/35 bg-ruby/10 text-ruby dark:text-ruby [a&]:hover:bg-ruby/15",
+        rose: "border-ruby/35 bg-ruby/10 text-ruby dark:border-destructive/35 dark:bg-destructive/10 dark:text-destructive [a&]:hover:bg-ruby/15",
       },
     },
     defaultVariants: {

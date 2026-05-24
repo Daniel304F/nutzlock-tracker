@@ -52,6 +52,7 @@ Update that file when a new reusable pattern is established.
 - Color, radius, and dark-mode tokens are defined as OKLCH custom properties in `:root` / `.dark` and bridged into Tailwind via `@theme inline`.
 - The `cn()` helper in [src/lib/utils.ts](../src/lib/utils.ts) merges class names through `clsx` + `tailwind-merge`. Use it whenever a component composes conditional classes.
 - Dark mode is provided through `next-themes`; keep the global theme toggle in the app shell.
+- App chrome uses one semantic primary accent (`bg-primary`) rather than multi-color palette strips, so light and dark mode each get their own fitting accent.
 - Palette utilities are exposed as Tailwind tokens: `hibiscus`, `ruby`, `aura`, `indigo`, `nocturne`, `charcoal`, `mist`, `neon`, and `steel`.
 
 ## Component Conventions

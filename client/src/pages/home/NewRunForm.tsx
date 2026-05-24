@@ -204,11 +204,7 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
 
   return (
     <Card className="overflow-hidden rounded-lg border-border/80 bg-card/95 p-0 shadow-sm">
-      <div aria-hidden="true" className="grid h-1 grid-cols-3">
-        <span className="bg-hibiscus" />
-        <span className="bg-ruby" />
-        <span className="bg-neon" />
-      </div>
+      <div aria-hidden="true" className="h-1 bg-primary" />
 
       <form className="space-y-5 p-5" onSubmit={handleSubmit}>
         <div className="flex items-start gap-3">
