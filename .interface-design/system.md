@@ -35,7 +35,7 @@ Color roles (semantic shadcn tokens, generated from supplied palettes):
 - Text: `text-foreground`
 - Muted text: `text-muted-foreground`
 - Surfaces: `bg-card`, `bg-popover`
-- Primary action: `bg-primary` / `text-primary-foreground` (Hibiscus indigo `#5848B3` in light, neon `#E2E800` in dark)
+- Primary action: `bg-primary` / `text-primary-foreground` (logo blue `#0070FF` in light, logo-adjacent purple `#B080FF` in dark)
 - Borders & focus rings: `border-border`, `ring-ring`
 - Destructive / death: `bg-destructive` / `text-destructive-foreground` (ruby `#DD3027`)
 
@@ -46,7 +46,7 @@ Palette utilities exposed through Tailwind tokens:
 - Aura purple: `bg-aura` / `text-aura` (`#733D6F`)
 - Indigo: `bg-indigo` / `text-indigo` (`#5848B3`)
 - Urban neutrals: `bg-nocturne`, `bg-charcoal`, `bg-mist`, `bg-steel`
-- Warning / high-energy signal: `bg-neon` / `text-neon` (`#E2E800`)
+- Warning / high-energy signal: `bg-neon` / `text-neon` (warm orange `#F97316` in light, softened gold `#FACC15` in dark)
 
 Avoid a one-hue UI. Status colors must be paired with icons or labels, not color alone.
 
@@ -55,19 +55,21 @@ Avoid a one-hue UI. Status colors must be paired with icons or labels, not color
 App shell:
 
 - Top-level app experience first, not a marketing landing page.
-- Use a single semantic primary rail and compact brand tile as the product signature.
+- Use the real `nutzlock_logo.png` asset in the global header and footer as the product signature.
+- Use a single semantic primary rail for color continuity.
 - Avoid multi-color palette rails in the app chrome; `bg-primary` should adapt between light and dark mode.
 - Primary navigation should remain predictable on desktop and mobile.
 - Do not hide core actions behind hover-only affordances.
 - Keep the theme toggle visible in the global header.
-- Keep a compact full-width footer in the global shell with brand continuity and restrained stack/status badges.
+- Keep a compact full-width footer in the global shell with brand continuity and the public GitHub repository link.
 - Desktop app surfaces should use a wider `104rem` shell before falling back to side margins.
 
 Home workspace:
 
 - Use a compact command-center hero, not a marketing hero.
-- Keep the run creation form prominent and sticky on wide screens.
-- On wide desktop, reserve a wider setup column around 440-460px and let the run workspace expand.
+- Keep the run creation form prominent, left-aligned, and sticky on wide screens.
+- On wide desktop, reserve a setup column around 440-460px on the left and let the run workspace expand to the right.
+- Prefer vertical radio-card groups inside narrow setup panels so German labels do not overflow.
 - On mobile, stack hero, actions, recent runs, and setup without horizontal scrolling.
 - Preserve the run creation API object shape when restyling the form.
 
