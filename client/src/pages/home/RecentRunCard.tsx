@@ -14,6 +14,11 @@ type RecentRunCardProps = {
   run: RunResponse;
 };
 
+const challengeModeLabels = {
+  nuzlocke: "Nuzlocke",
+  soullink: "Soullink",
+} as const;
+
 function formatUpdatedAt(updatedAt: string) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",
@@ -36,23 +41,23 @@ export function RecentRunCard({ run }: RecentRunCardProps) {
         <CardDescription className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="inline-flex items-center gap-1.5">
             <Clock3 aria-hidden="true" className="size-3.5" />
-            updated {formatUpdatedAt(run.updated_at)}
+            aktualisiert {formatUpdatedAt(run.updated_at)}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <UsersRound aria-hidden="true" className="size-3.5" />
-            {run.player_count} {run.player_count === 1 ? "player" : "players"}
+            {run.player_count} Spieler
           </span>
         </CardDescription>
         <CardAction className="flex flex-wrap gap-2">
           <RunBadge tone={run.challenge_mode === "soullink" ? "sky" : "emerald"}>
-            {run.challenge_mode}
+            {challengeModeLabels[run.challenge_mode]}
           </RunBadge>
-          {run.is_randomizer ? <RunBadge tone="violet">RNG</RunBadge> : null}
+          {run.is_randomizer ? <RunBadge tone="violet">Randomizer</RunBadge> : null}
         </CardAction>
       </CardHeader>
       <CardContent className="px-4 pl-5">
-        <p className="text-xs font-medium uppercase text-muted-foreground">
-          {run.game_version_ref}
+        <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
+          Edition: {run.game_version_ref}
         </p>
       </CardContent>
     </Card>

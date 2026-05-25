@@ -56,7 +56,7 @@ const runModes = [
     value: "nuzlocke",
   },
   {
-    description: "Zufaellige Begegnungen",
+    description: "Zufällige Begegnungen",
     icon: Shuffle,
     label: "Randomizer",
     value: "randomizer",
@@ -118,7 +118,7 @@ function RadioCardGroup<T extends string>({
   return (
     <RadioGroup
       aria-label={ariaLabel}
-      className={cn("mt-2 grid gap-2", className)}
+      className={cn("mt-2 grid items-stretch gap-2", className)}
       name={name}
       value={value}
       onValueChange={(next) => onChange(next as T)}
@@ -133,7 +133,7 @@ function RadioCardGroup<T extends string>({
             htmlFor={itemId}
             key={option.value}
             className={cn(
-              "flex min-h-16 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all hover:-translate-y-0.5",
+              "grid min-h-14 cursor-pointer grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all hover:-translate-y-0.5",
               isSelected
                 ? "border-primary bg-primary/10 text-foreground shadow-sm ring-1 ring-primary/20"
                 : "border-border/80 bg-background/60 text-foreground hover:border-primary/40 hover:bg-secondary/80",
@@ -154,9 +154,11 @@ function RadioCardGroup<T extends string>({
             >
               <Icon className="size-4" />
             </span>
-            <span>
-              <span className="block font-semibold">{option.label}</span>
-              <span className="block text-xs text-muted-foreground">
+            <span className="min-w-0">
+              <span className="block break-words font-semibold leading-5">
+                {option.label}
+              </span>
+              <span className="block break-words text-xs leading-4 text-muted-foreground">
                 {option.description}
               </span>
             </span>
@@ -206,28 +208,28 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
     <Card className="overflow-hidden rounded-lg border-border/80 bg-card/95 p-0 shadow-sm">
       <div aria-hidden="true" className="h-1 bg-primary" />
 
-      <form className="space-y-5 p-5" onSubmit={handleSubmit}>
-        <div className="flex items-start gap-3">
+      <form onSubmit={handleSubmit}>
+        <div className="flex items-start gap-3 border-b border-border/70 px-5 py-5">
           <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
             <Plus aria-hidden="true" className="size-5" />
           </span>
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-foreground">New run</h2>
+            <h2 className="text-lg font-semibold text-foreground">Run anlegen</h2>
             <p className="text-sm leading-5 text-muted-foreground">
-              Choose the run shape now. Rooms, rules, and recovery can expand
-              from this object later.
+              Lege den Kern deines Runs an. Räume, Regeln und Wiederherstellung
+              hängen später sauber an diesem Datensatz.
             </p>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5 px-5 py-5">
           <div className="space-y-1.5">
-            <Label htmlFor={nameId}>Run name</Label>
+            <Label htmlFor={nameId}>Run-Name</Label>
             <Input
               className="min-h-11 bg-background/70"
               id={nameId}
               name="name"
-              placeholder="Heartgold w/ Sam"
+              placeholder="HeartGold mit Sam"
               required
               type="text"
             />
@@ -238,7 +240,6 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
             <RadioCardGroup
               ariaLabel="Spielertyp"
               baseId={playerKindId}
-              className="sm:grid-cols-3"
               name="player_kind"
               onChange={setPlayerKind}
               options={playerKinds}
@@ -280,7 +281,7 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
           </fieldset>
 
           <div className="space-y-1.5">
-            <Label htmlFor={editionId}>Edition key</Label>
+            <Label htmlFor={editionId}>Edition</Label>
             <Input
               className="min-h-11 bg-background/70"
               defaultValue="emerald"
@@ -292,20 +293,22 @@ export function NewRunForm({ onCreateRun }: NewRunFormProps) {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor={notesId}>Notes</Label>
+            <Label htmlFor={notesId}>Notizen</Label>
             <Textarea
               className="min-h-20 bg-background/70"
               id={notesId}
               name="notes"
-              placeholder="Seed, partner, route plan"
+              placeholder="Seed, Partner, Routenplan"
             />
           </div>
         </div>
 
-        <Button className="min-h-11 w-full shadow-sm" disabled={isSubmitting} type="submit">
-          <Plus aria-hidden="true" />
-          Create run
-        </Button>
+        <div className="border-t border-border/70 bg-background/35 px-5 py-4">
+          <Button className="min-h-11 w-full shadow-sm" disabled={isSubmitting} type="submit">
+            <Plus aria-hidden="true" />
+            Run erstellen
+          </Button>
+        </div>
       </form>
     </Card>
   );

@@ -22,10 +22,10 @@ export function RecentRunsSection({ message, onRefresh, runs, status }: RecentRu
       <div className="flex flex-col gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-foreground" id="recent-runs-heading">
-            Recent runs
+            Aktuelle Runs
           </h2>
           <p className="text-sm text-muted-foreground">
-            {runs.length} active workspace {runs.length === 1 ? "entry" : "entries"}
+            {runs.length} aktive {runs.length === 1 ? "Eintragung" : "Eintragungen"}
           </p>
         </div>
         <Button
@@ -37,14 +37,14 @@ export function RecentRunsSection({ message, onRefresh, runs, status }: RecentRu
           onClick={() => void onRefresh()}
         >
           <RefreshCw aria-hidden="true" />
-          Refresh
+          Aktualisieren
         </Button>
       </div>
 
       <div className="mt-4 grid gap-3">
         {status === "loading" ? (
           <Alert className="border-border/80 bg-background/60">
-            <AlertDescription>Loading runs</AlertDescription>
+            <AlertDescription>Runs werden geladen</AlertDescription>
           </Alert>
         ) : null}
 
@@ -57,7 +57,7 @@ export function RecentRunsSection({ message, onRefresh, runs, status }: RecentRu
 
         {status === "ready" && runs.length === 0 ? (
           <Alert className="border-border/80 bg-background/60">
-            <AlertDescription>No runs yet</AlertDescription>
+            <AlertDescription>Noch keine Runs</AlertDescription>
           </Alert>
         ) : null}
 
