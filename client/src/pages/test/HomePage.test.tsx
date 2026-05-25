@@ -73,12 +73,21 @@ describe("HomePage", () => {
     expect(screen.getAllByAltText("Nutzlocke and Soullink logo")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Switch to dark mode" })).toBeInTheDocument();
     expect(screen.queryByText(/Modern run command center/i)).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "New run" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Run anlegen" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Spielzentrale" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Randomizer/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Run erstellen" })).toBeInTheDocument();
+    expect(screen.getByText("Raum beitreten")).toBeInTheDocument();
+    expect(screen.getByText("JSON importieren")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Aktuelle Runs" })).toBeInTheDocument();
     expect(screen.getByText("Heartgold w/ Sam")).toBeInTheDocument();
-    expect(screen.getByText("soullink")).toBeInTheDocument();
-    expect(screen.getByText("RNG")).toBeInTheDocument();
+    expect(screen.getByText("Soullink")).toBeInTheDocument();
+    expect(screen.getAllByText("Randomizer").length).toBeGreaterThan(0);
     expect(screen.getByRole("contentinfo")).toHaveTextContent("Nutzlock Tracker");
+    expect(
+      screen.getByRole("link", { name: "Daniel304F/nutzlock-tracker" }),
+    ).toHaveAttribute("href", "https://github.com/Daniel304F/nutzlock-tracker");
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent("React");
   });
 
   it("submits a new run and shows success feedback", async () => {
@@ -87,13 +96,13 @@ describe("HomePage", () => {
 
     renderHomePage();
 
-    await user.clear(screen.getByLabelText("Run name"));
-    await user.type(screen.getByLabelText("Run name"), "Emerald solo");
-    await user.clear(screen.getByLabelText("Edition key"));
-    await user.type(screen.getByLabelText("Edition key"), "emerald");
-    await user.type(screen.getByLabelText("Notes"), "First clear attempt.");
+    await user.clear(screen.getByLabelText("Run-Name"));
+    await user.type(screen.getByLabelText("Run-Name"), "Emerald solo");
+    await user.clear(screen.getByLabelText("Edition"));
+    await user.type(screen.getByLabelText("Edition"), "emerald");
+    await user.type(screen.getByLabelText("Notizen"), "First clear attempt.");
 
-    await user.click(screen.getByRole("button", { name: "Create run" }));
+    await user.click(screen.getByRole("button", { name: "Run erstellen" }));
 
     await waitFor(() => {
       expect(createRunMock).toHaveBeenCalledWith({
@@ -105,8 +114,8 @@ describe("HomePage", () => {
         player_count: 1,
       });
     });
-    expect(toastMock.success).toHaveBeenCalledWith("Run created", {
-      description: "Emerald solo is ready.",
+    expect(toastMock.success).toHaveBeenCalledWith("Run erstellt", {
+      description: "Emerald solo ist bereit.",
     });
   });
 
@@ -121,10 +130,10 @@ describe("HomePage", () => {
 
     renderHomePage();
 
-    await user.clear(screen.getByLabelText("Run name"));
-    await user.type(screen.getByLabelText("Run name"), "Emerald randomizer");
+    await user.clear(screen.getByLabelText("Run-Name"));
+    await user.type(screen.getByLabelText("Run-Name"), "Emerald randomizer");
     await user.click(screen.getByRole("radio", { name: /Randomizer/ }));
-    await user.click(screen.getByRole("button", { name: "Create run" }));
+    await user.click(screen.getByRole("button", { name: "Run erstellen" }));
 
     await waitFor(() => {
       expect(createRunMock).toHaveBeenCalledWith({
@@ -150,15 +159,15 @@ describe("HomePage", () => {
 
     renderHomePage();
 
-    await user.clear(screen.getByLabelText("Run name"));
-    await user.type(screen.getByLabelText("Run name"), "Quad soullink");
+    await user.clear(screen.getByLabelText("Run-Name"));
+    await user.type(screen.getByLabelText("Run-Name"), "Quad soullink");
     await user.click(screen.getByRole("radio", { name: /Mehrspieler/ }));
 
     const countInput = screen.getByLabelText("Anzahl Spieler");
     await user.clear(countInput);
     await user.type(countInput, "4");
 
-    await user.click(screen.getByRole("button", { name: "Create run" }));
+    await user.click(screen.getByRole("button", { name: "Run erstellen" }));
 
     await waitFor(() => {
       expect(createRunMock).toHaveBeenCalledWith({

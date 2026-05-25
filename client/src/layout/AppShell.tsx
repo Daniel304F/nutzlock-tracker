@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
-import { Activity, Compass, Link2, ShieldCheck } from "lucide-react";
+import { Activity, Code2, Compass, ExternalLink, Link2, ShieldCheck } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@components/theme/ThemeToggle";
+import nutzlockLogo from "@assets/nutzlock_logo.png";
 import { cn } from "@/lib/utils";
 
 type AppShellProps = {
@@ -24,8 +24,6 @@ const navItems = [
   { icon: ShieldCheck, label: "Rules" },
 ] as const;
 
-const footerTags = ["React", "FastAPI", "shadcn/ui"] as const;
-
 export function AppShell({ apiLabel, apiStatus, children }: AppShellProps) {
   return (
     <main className="flex min-h-screen flex-col overflow-x-hidden bg-background text-foreground">
@@ -35,9 +33,12 @@ export function AppShell({ apiLabel, apiStatus, children }: AppShellProps) {
         <header className="sticky top-0 z-30 -mx-4 border-b border-border/70 bg-background/90 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-center gap-3">
-              <div
-                aria-hidden="true"
-                className="size-11 shrink-0 rounded-lg border border-primary/25 bg-primary shadow-sm"
+              <img
+                alt="Nutzlocke and Soullink logo"
+                className="size-14 shrink-0 rounded-lg border border-border bg-white object-contain p-1 shadow-sm"
+                height={56}
+                src={nutzlockLogo}
+                width={56}
               />
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-muted-foreground">
@@ -97,9 +98,12 @@ export function AppShell({ apiLabel, apiStatus, children }: AppShellProps) {
       >
         <div className="mx-auto flex w-full max-w-[104rem] flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
-            <div
-              aria-hidden="true"
-              className="size-9 shrink-0 rounded-md border border-primary/25 bg-primary"
+            <img
+              alt="Nutzlocke and Soullink logo"
+              className="size-12 shrink-0 rounded-md border border-border bg-white object-contain p-1"
+              height={48}
+              src={nutzlockLogo}
+              width={48}
             />
             <div className="min-w-0">
               <p className="font-semibold text-foreground">Nutzlock Tracker</p>
@@ -107,13 +111,16 @@ export function AppShell({ apiLabel, apiStatus, children }: AppShellProps) {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {footerTags.map((tag) => (
-              <Badge className="rounded-md px-2.5 py-1" key={tag} variant="outline">
-                {tag}
-              </Badge>
-            ))}
-          </div>
+          <a
+            className="inline-flex min-h-9 w-fit items-center gap-2 rounded-md border border-border bg-background px-3 py-2 font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            href="https://github.com/Daniel304F/nutzlock-tracker"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <Code2 aria-hidden="true" className="size-4" />
+            Daniel304F/nutzlock-tracker
+            <ExternalLink aria-hidden="true" className="size-3.5 text-muted-foreground" />
+          </a>
         </div>
       </footer>
     </main>

@@ -61,7 +61,7 @@
   --nocturne: #141414;
   --charcoal: #444444;
   --mist: #d6d6d6;
-  --neon: #e2e800;
+  --neon: #f97316;
   --steel: #979797;
   --background: #f7f7f5;
   --foreground: #141414;
@@ -69,7 +69,7 @@
   --card-foreground: #141414;
   --popover: #ffffff;
   --popover-foreground: #141414;
-  --primary: #5848b3;
+  --primary: #0070ff;
   --primary-foreground: #ffffff;
   --secondary: #eeeeee;
   --secondary-foreground: #141414;
@@ -81,23 +81,24 @@
   --destructive-foreground: #ffffff;
   --border: #d6d6d6;
   --input: #d6d6d6;
-  --ring: #ea44d4;
+  --ring: #f97316;
   --chart-1: #ea44d4;
   --chart-2: #dd3027;
   --chart-3: #733d6f;
-  --chart-4: #5848b3;
-  --chart-5: #e2e800;
+  --chart-4: #0070ff;
+  --chart-5: #f97316;
 }
 
 .dark {
   color-scheme: dark;
+  --neon: #facc15;
   --background: #141414;
   --foreground: #f7f7f5;
   --card: #202020;
   --card-foreground: #f7f7f5;
   --popover: #242424;
   --popover-foreground: #f7f7f5;
-  --primary: #e2e800;
+  --primary: #b080ff;
   --primary-foreground: #141414;
   --secondary: #2b2b2b;
   --secondary-foreground: #f7f7f5;
@@ -109,12 +110,12 @@
   --destructive-foreground: #141414;
   --border: #444444;
   --input: #444444;
-  --ring: #e2e800;
+  --ring: #facc15;
   --chart-1: #ea44d4;
   --chart-2: #ff5e57;
   --chart-3: #9772d8;
-  --chart-4: #e2e800;
-  --chart-5: #d6d6d6;
+  --chart-4: #facc15;
+  --chart-5: #b080ff;
 }
 
 @layer base {
