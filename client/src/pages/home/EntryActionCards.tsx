@@ -1,6 +1,6 @@
 import { FileUp, Link2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type EntryActionProps = {
   description: string;
@@ -10,39 +10,44 @@ type EntryActionProps = {
 
 function EntryAction({ description, icon: Icon, title }: EntryActionProps) {
   return (
-    <Button
-      className="h-auto min-h-24 w-full justify-start gap-4 border-border/80 bg-card/90 px-4 py-4 text-left whitespace-normal shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50"
-      disabled
-      type="button"
-      variant="outline"
+    <article
+      aria-disabled="true"
+      className="rounded-lg border border-border/80 bg-card/85 p-4 shadow-sm transition-colors hover:border-primary/40 hover:bg-card"
     >
-      <span
-        aria-hidden="true"
-        className="inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/35 bg-primary/10 text-primary"
-      >
-        <Icon className="size-5" />
-      </span>
-      <span className="flex flex-col items-start gap-0.5">
-        <span className="font-semibold text-foreground">{title}</span>
-        <span className="text-xs leading-5 text-muted-foreground">{description}</span>
-      </span>
-    </Button>
+      <div className="flex items-start gap-4">
+        <span
+          aria-hidden="true"
+          className="inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/35 bg-primary/10 text-primary"
+        >
+          <Icon className="size-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+            <Badge className="rounded-md" variant="outline">
+              Demnächst
+            </Badge>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
+        </div>
+      </div>
+    </article>
   );
 }
 
 export function EntryActionCards() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <section aria-label="Nächste Funktionen" className="grid gap-3 sm:grid-cols-2">
       <EntryAction
-        description="Room membership lands after runs."
+        description="Gemeinsame Räume werden der nächste Einstieg für Soullink-Runs."
         icon={Link2}
-        title="Join room"
+        title="Raum beitreten"
       />
       <EntryAction
-        description="Backup restore comes with export shape."
+        description="Backups und Transfers folgen mit dem versionierten Exportformat."
         icon={FileUp}
-        title="Import JSON"
+        title="JSON importieren"
       />
-    </div>
+    </section>
   );
 }

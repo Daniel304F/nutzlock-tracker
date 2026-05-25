@@ -15,7 +15,7 @@ function getApiLabel(apiState: ReturnType<typeof useApiHealth>) {
   }
 
   if (apiState.status === "loading") {
-    return "API wird geprueft";
+    return "API wird geprüft";
   }
 
   return apiState.message;
@@ -64,25 +64,36 @@ const heroStats = [
   {
     getValue: (stats: WorkspaceStats) => stats.playerSlots,
     icon: UsersRound,
-    label: "Player slots",
+    label: "Spielerplätze",
   },
 ] as const;
 
 function WorkspaceHero({ stats }: { stats: WorkspaceStats }) {
   return (
     <section className="relative overflow-hidden rounded-lg border border-border/80 bg-card text-card-foreground shadow-sm">
-      <div aria-hidden="true" className="h-1.5 bg-primary" />
-
-      <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)] lg:p-7">
+      <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(260px,360px)] lg:p-7">
         <div className="min-w-0">
-          <h2 className="max-w-2xl text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
-            Track encounters, links, rooms, and losses without slowing the run.
+          <p className="inline-flex rounded-md border border-primary/25 bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase text-primary">
+            Run Command Center
+          </p>
+          <h2 className="mt-4 max-w-2xl text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+            Spielzentrale
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-            A responsive play-session workspace for quick setup now and deeper
-            Soullink state later. The form keeps the same run data shape while
-            the surface gets sharper, brighter, and dark-mode ready.
+            Erstelle neue Runs, behalte aktive Soullinks im Blick und springe
+            direkt in die wichtigsten Aktionen, ohne den Spielfluss zu bremsen.
           </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <span className="rounded-md border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+              Mobile-first
+            </span>
+            <span className="rounded-md border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+              Soft Validation
+            </span>
+            <span className="rounded-md border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+              Soullink-ready
+            </span>
+          </div>
         </div>
 
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
@@ -91,7 +102,7 @@ function WorkspaceHero({ stats }: { stats: WorkspaceStats }) {
 
             return (
               <div
-                className="rounded-lg border border-border/80 bg-background/60 p-3 text-left"
+                className="rounded-lg border border-border/80 bg-background/70 p-3 text-left transition-colors hover:border-primary/40"
                 key={item.label}
               >
                 <Icon aria-hidden="true" className="mb-3 size-4 text-primary" />
@@ -119,13 +130,13 @@ export function HomePage() {
   async function handleCreateRun(input: RunCreateInput): Promise<RunResponse> {
     try {
       const run = await runsState.createRun(input);
-      toast.success("Run created", {
-        description: `${run.name} is ready.`,
+      toast.success("Run erstellt", {
+        description: `${run.name} ist bereit.`,
       });
       return run;
     } catch (error: unknown) {
-      toast.error("Run could not be created", {
-        description: getErrorMessage(error, "Please try again."),
+      toast.error("Run konnte nicht erstellt werden", {
+        description: getErrorMessage(error, "Bitte erneut versuchen."),
       });
       throw error;
     }
@@ -133,8 +144,12 @@ export function HomePage() {
 
   return (
     <AppShell apiLabel={getApiLabel(apiState)} apiStatus={apiState.status}>
-      <section className="grid flex-1 gap-5 py-5 xl:grid-cols-[minmax(0,1fr)_440px] 2xl:gap-6 2xl:grid-cols-[minmax(0,1fr)_460px]">
-        <div className="min-w-0 space-y-5">
+      <section className="grid flex-1 gap-5 py-5 xl:grid-cols-[440px_minmax(0,1fr)] 2xl:grid-cols-[460px_minmax(0,1fr)] 2xl:gap-6">
+        <aside className="order-2 min-w-0 xl:sticky xl:top-24 xl:order-1 xl:self-start">
+          <NewRunForm onCreateRun={handleCreateRun} />
+        </aside>
+
+        <div className="order-1 min-w-0 space-y-5 xl:order-2">
           <WorkspaceHero stats={workspaceStats} />
 
           <EntryActionCards />
@@ -146,10 +161,6 @@ export function HomePage() {
             onRefresh={runsState.refresh}
           />
         </div>
-
-        <aside className="min-w-0 xl:sticky xl:top-24 xl:self-start">
-          <NewRunForm onCreateRun={handleCreateRun} />
-        </aside>
       </section>
     </AppShell>
   );
