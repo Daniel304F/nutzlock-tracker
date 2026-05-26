@@ -76,6 +76,7 @@ describe("trackerApi", () => {
   it("records an encounter", async () => {
     const input: EncounterCreateInput = {
       encounter_status: "caught",
+      is_shiny: true,
       location_slot_id: "location-1",
       nickname: "Zip",
       species_ref: "zigzagoon",

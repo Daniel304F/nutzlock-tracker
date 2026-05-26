@@ -66,6 +66,7 @@ export function useRunTracker(runId: string): UseRunTrackerResult {
         ability: input.ability,
         encounter_status: input.encounter_status,
         gender: input.gender,
+        is_shiny: input.is_shiny,
         level: input.level,
         location_slot_id: location.id,
         member_id: input.member_id,

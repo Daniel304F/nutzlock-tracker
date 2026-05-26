@@ -31,6 +31,7 @@ export type EncounterCreateInput = {
   ability?: string | null;
   encounter_status: EncounterStatus;
   gender?: Gender | null;
+  is_shiny?: boolean;
   level?: number | null;
   location_slot_id: string;
   member_id?: string | null;
@@ -65,6 +66,7 @@ export type EncounterResponse = {
   encounter_status: EncounterStatus;
   gender: Gender | null;
   id: string;
+  is_shiny: boolean;
   level: number | null;
   location_slot_id: string;
   member_id: string | null;

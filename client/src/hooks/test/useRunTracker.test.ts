@@ -74,7 +74,8 @@ describe("useRunTracker", () => {
         encounter_status: "caught",
         gender: null,
         id: "encounter-1",
-        level: 4,
+        is_shiny: true,
+        level: null,
         location_slot_id: "location-1",
         member_id: null,
         nature: null,
@@ -97,7 +98,7 @@ describe("useRunTracker", () => {
     await act(async () => {
       await result.current.recordEncounter({
         encounter_status: "caught",
-        level: 4,
+        is_shiny: true,
         location_name: "Route 101",
         nickname: "Zip",
         species_ref: "zigzagoon",
@@ -108,11 +109,16 @@ describe("useRunTracker", () => {
       name: "Route 101",
     });
     expect(mockedTrackerApi.recordEncounter).toHaveBeenCalledWith("run-1", {
+      ability: undefined,
       encounter_status: "caught",
-      level: 4,
+      gender: undefined,
+      is_shiny: true,
+      level: undefined,
       location_slot_id: "location-1",
       member_id: undefined,
+      nature: undefined,
       nickname: "Zip",
+      notes: undefined,
       species_ref: "zigzagoon",
     });
     expect(mockedTrackerApi.get).toHaveBeenCalledTimes(2);
