@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from nutzlock_tracker.database import Base, get_db
 from nutzlock_tracker.main import create_app
+from nutzlock_tracker.rooms.models import Member, Room
 from nutzlock_tracker.rules.models import Ruleset
 
 
@@ -72,10 +73,48 @@ async def test_create_run_persists_core_fields(harness: ApiHarness) -> None:
     assert run["game_version_ref"] == "heartgold"
     assert run["status"] == "active"
     assert run["ruleset_id"]
-    assert run["room_id"] is None
+    assert run["room_id"]
     assert run["randomizer_config_id"] is None
     assert run["created_at"]
     assert run["updated_at"]
+
+
+@pytest.mark.asyncio
+async def test_create_soullink_run_persists_room_and_owner(harness: ApiHarness) -> None:
+    run = await create_run(harness.client)
+
+    async with harness.session_factory() as session:
+        room = await session.scalar(
+            select(Room).where(Room.id == run["room_id"]),
+        )
+        owner = await session.scalar(
+            select(Member).where(Member.id == room.created_by_member_id),
+        )
+
+    assert room is not None
+    assert room.run_id == run["id"]
+    assert room.join_code
+    assert room.join_code_revoked_at is None
+    assert owner is not None
+    assert owner.room_id == room.id
+    assert owner.display_name == "Spieler 1"
+    assert owner.role == "owner"
+
+
+@pytest.mark.asyncio
+async def test_create_solo_run_has_no_room(harness: ApiHarness) -> None:
+    response = await harness.client.post(
+        "/api/v1/runs",
+        json={
+            "challenge_mode": "nuzlocke",
+            "game_version_ref": "emerald",
+            "is_randomizer": False,
+            "name": "Emerald solo",
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json()["room_id"] is None
 
 
 @pytest.mark.asyncio
