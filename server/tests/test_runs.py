@@ -156,6 +156,24 @@ async def test_list_runs_returns_newest_first(harness: ApiHarness) -> None:
 
 
 @pytest.mark.asyncio
+async def test_read_run_returns_a_single_run(harness: ApiHarness) -> None:
+    run = await create_run(harness.client)
+
+    response = await harness.client.get(f"/api/v1/runs/{run['id']}")
+
+    assert response.status_code == 200
+    assert response.json()["id"] == run["id"]
+    assert response.json()["name"] == "Heartgold w/ Sam"
+
+
+@pytest.mark.asyncio
+async def test_read_run_rejects_unknown_run(harness: ApiHarness) -> None:
+    response = await harness.client.get("/api/v1/runs/missing-run")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_create_run_rejects_blank_name(harness: ApiHarness) -> None:
     response = await harness.client.post(
         "/api/v1/runs",
