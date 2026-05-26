@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from nutzlock_tracker.config import get_settings
 from nutzlock_tracker.database import init_db
+from nutzlock_tracker.encounters.router import router as encounters_router
 from nutzlock_tracker.health.router import router as health_router
 from nutzlock_tracker.rooms.router import router as rooms_router
 from nutzlock_tracker.runs.router import router as runs_router
@@ -61,6 +62,7 @@ def create_app(init_database: bool = True) -> FastAPI:
     )
 
     app.include_router(health_router, prefix=settings.api_v1_prefix)
+    app.include_router(encounters_router, prefix=settings.api_v1_prefix)
     app.include_router(rooms_router, prefix=settings.api_v1_prefix)
     app.include_router(runs_router, prefix=settings.api_v1_prefix)
     return app
