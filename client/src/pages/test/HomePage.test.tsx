@@ -11,6 +11,7 @@ const toastMock = vi.hoisted(() => ({
 }));
 
 const useApiHealthMock = vi.hoisted(() => vi.fn());
+const useJoinRoomMock = vi.hoisted(() => vi.fn());
 const useRunsMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@components/toast/ToastProvider", () => ({
@@ -21,11 +22,16 @@ vi.mock("@hooks/useApiHealth", () => ({
   useApiHealth: useApiHealthMock,
 }));
 
+vi.mock("@hooks/useJoinRoom", () => ({
+  useJoinRoom: useJoinRoomMock,
+}));
+
 vi.mock("@hooks/useRuns", () => ({
   useRuns: useRunsMock,
 }));
 
 const createRunMock = vi.fn();
+const joinRoomMock = vi.fn();
 
 const run = {
   challenge_mode: "soullink",
@@ -37,7 +43,7 @@ const run = {
   notes: "Shared route.",
   player_count: 2,
   randomizer_config_id: null,
-  room_id: null,
+  room_id: "room-1",
   ruleset_id: "ruleset-1",
   status: "active",
   updated_at: "2026-05-24T17:00:00Z",
@@ -58,6 +64,12 @@ describe("HomePage", () => {
       health: { service: "nutzlock-tracker-api", status: "ok" },
       status: "online",
     });
+    useJoinRoomMock.mockReturnValue({
+      joinRoom: joinRoomMock,
+      joinedRoom: null,
+      message: null,
+      status: "idle",
+    });
     useRunsMock.mockReturnValue({
       createRun: createRunMock,
       message: null,
@@ -77,11 +89,14 @@ describe("HomePage", () => {
     expect(screen.getByRole("heading", { name: "Spielzentrale" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Randomizer/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Run erstellen" })).toBeInTheDocument();
-    expect(screen.getByText("Raum beitreten")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Raum beitreten" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Beitrittscode")).toBeInTheDocument();
+    expect(screen.getByLabelText("Dein Name")).toBeInTheDocument();
     expect(screen.getByText("JSON importieren")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Aktuelle Runs" })).toBeInTheDocument();
     expect(screen.getByText("Heartgold w/ Sam")).toBeInTheDocument();
-    expect(screen.getByText("Soullink")).toBeInTheDocument();
+    expect(screen.getAllByText("Soullink").length).toBeGreaterThan(0);
+    expect(screen.getByText("Raum bereit")).toBeInTheDocument();
     expect(screen.getAllByText("Randomizer").length).toBeGreaterThan(0);
     expect(screen.getByRole("contentinfo")).toHaveTextContent("Nutzlock Tracker");
     expect(
@@ -92,7 +107,12 @@ describe("HomePage", () => {
 
   it("submits a new run and shows success feedback", async () => {
     const user = userEvent.setup();
-    createRunMock.mockResolvedValueOnce({ ...run, name: "Emerald solo" });
+    createRunMock.mockResolvedValueOnce({
+      ...run,
+      challenge_mode: "nuzlocke",
+      name: "Emerald solo",
+      room_id: null,
+    });
 
     renderHomePage();
 
@@ -116,6 +136,46 @@ describe("HomePage", () => {
     });
     expect(toastMock.success).toHaveBeenCalledWith("Run erstellt", {
       description: "Emerald solo ist bereit.",
+    });
+  });
+
+  it("joins a room and shows success feedback", async () => {
+    const user = userEvent.setup();
+    joinRoomMock.mockResolvedValueOnce({
+      member: {
+        display_name: "Sam",
+        id: "member-2",
+        joined_at: "2026-05-24T17:05:00Z",
+        last_seen_at: null,
+        role: "partner",
+      },
+      room: {
+        created_at: "2026-05-24T17:00:00Z",
+        created_by_member_id: "member-1",
+        id: "room-1",
+        join_code: "ABCD2345EF",
+        join_code_revoked_at: null,
+        members: [],
+        read_only_token: null,
+        run_id: "run-1",
+        updated_at: "2026-05-24T17:05:00Z",
+      },
+    });
+
+    renderHomePage();
+
+    await user.type(screen.getByLabelText("Beitrittscode"), "ABCD2345EF");
+    await user.type(screen.getByLabelText("Dein Name"), "Sam");
+    await user.click(screen.getByRole("button", { name: "Raum beitreten" }));
+
+    await waitFor(() => {
+      expect(joinRoomMock).toHaveBeenCalledWith({
+        display_name: "Sam",
+        join_code: "ABCD2345EF",
+      });
+    });
+    expect(toastMock.success).toHaveBeenCalledWith("Raum beigetreten", {
+      description: "Sam ist im Raum ABCD2345EF.",
     });
   });
 
