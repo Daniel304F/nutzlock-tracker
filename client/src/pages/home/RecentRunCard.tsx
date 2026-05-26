@@ -1,5 +1,5 @@
 import type { RunResponse } from "@api/runs";
-import { Clock3, Gamepad2, UsersRound } from "lucide-react";
+import { ArrowRight, Clock3, Gamepad2, UsersRound } from "lucide-react";
 import {
   Card,
   CardAction,
@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { RunBadge } from "@pages/home/RunBadge";
 
 type RecentRunCardProps = {
@@ -27,6 +28,8 @@ function formatUpdatedAt(updatedAt: string) {
 }
 
 export function RecentRunCard({ run }: RecentRunCardProps) {
+  const runHref = `/workspace/runs/${encodeURIComponent(run.id)}`;
+
   return (
     <Card className="group relative gap-3 overflow-hidden rounded-lg border-border/80 bg-background/60 py-4 shadow-none transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-card hover:shadow-sm">
       <span
@@ -56,10 +59,16 @@ export function RecentRunCard({ run }: RecentRunCardProps) {
           {run.is_randomizer ? <RunBadge tone="violet">Randomizer</RunBadge> : null}
         </CardAction>
       </CardHeader>
-      <CardContent className="px-4 pl-5">
+      <CardContent className="flex flex-col gap-3 px-4 pl-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
           Edition: {run.game_version_ref}
         </p>
+        <Button asChild className="w-full sm:w-fit" size="sm" variant="outline">
+          <a aria-label={`${run.name} öffnen`} href={runHref}>
+            Öffnen
+            <ArrowRight aria-hidden="true" />
+          </a>
+        </Button>
       </CardContent>
     </Card>
   );
