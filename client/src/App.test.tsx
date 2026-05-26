@@ -7,6 +7,10 @@ vi.mock("@pages/HomePage", () => ({
   HomePage: () => <h1>Workspace Page</h1>,
 }));
 
+vi.mock("@pages/RunDetailPage", () => ({
+  RunDetailPage: ({ runId }: { runId: string }) => <h1>Run Detail {runId}</h1>,
+}));
+
 describe("App", () => {
   beforeEach(() => {
     window.history.pushState({}, "", "/");
@@ -46,5 +50,14 @@ describe("App", () => {
     expect(
       screen.queryByRole("heading", { name: "Nutzlocke & Soullink Tracker App" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("renders a run detail route under the workspace", () => {
+    window.history.pushState({}, "", "/workspace/runs/run-1");
+
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Run Detail run-1" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Workspace Page" })).not.toBeInTheDocument();
   });
 });
