@@ -2,9 +2,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from nutzlock_tracker.model_utils import make_uuid
+from nutzlock_tracker.rooms.service import create_room_for_run
 from nutzlock_tracker.rules.service import build_default_ruleset
 from nutzlock_tracker.runs.models import Run
-from nutzlock_tracker.runs.schemas import RunCreate
+from nutzlock_tracker.runs.schemas import ChallengeMode, RunCreate
 
 
 async def create_run(session: AsyncSession, payload: RunCreate) -> Run:
@@ -23,6 +24,11 @@ async def create_run(session: AsyncSession, payload: RunCreate) -> Run:
     ruleset = build_default_ruleset(run_id=run_id, ruleset_id=ruleset_id)
 
     session.add_all([run, ruleset])
+
+    if payload.challenge_mode == ChallengeMode.soullink:
+        room, _ = await create_room_for_run(session, run_id)
+        run.room_id = room.id
+
     await session.commit()
     await session.refresh(run)
     return run
