@@ -113,7 +113,7 @@ Push-Location $serverRoot
 try {
     if (-not $SkipSync) {
         Write-Host "Syncing backend dependencies..."
-        python -m uv sync
+        uv sync
 
         if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
@@ -121,8 +121,6 @@ try {
     }
 
     $uvicornArgs = @(
-        "-m",
-        "uv",
         "run",
         "uvicorn",
         "nutzlock_tracker.main:app",
@@ -138,7 +136,7 @@ try {
 
     Write-Host "Starting API at http://$displayHost`:$resolvedPort/api/v1"
     Write-Host "Docs: http://$displayHost`:$resolvedPort/api/v1/docs"
-    python @uvicornArgs
+    uv @uvicornArgs
     exit $LASTEXITCODE
 }
 finally {
