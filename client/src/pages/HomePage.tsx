@@ -1,6 +1,8 @@
 import type { RunCreateInput, RunResponse } from "@api/runs";
+import type { RoomJoinInput } from "@api/rooms";
 import { useToastService } from "@components/toast/ToastProvider";
 import { useApiHealth } from "@hooks/useApiHealth";
+import { useJoinRoom } from "@hooks/useJoinRoom";
 import { useRuns } from "@hooks/useRuns";
 import { AppShell } from "@layout/AppShell";
 import { EntryActionCards } from "@pages/home/EntryActionCards";
@@ -124,6 +126,7 @@ function WorkspaceHero({ stats }: { stats: WorkspaceStats }) {
 export function HomePage() {
   const apiState = useApiHealth();
   const toast = useToastService();
+  const joinRoomState = useJoinRoom();
   const runsState = useRuns();
   const workspaceStats = getWorkspaceStats(runsState.runs);
 
@@ -131,12 +134,26 @@ export function HomePage() {
     try {
       const run = await runsState.createRun(input);
       toast.success("Run erstellt", {
-        description: `${run.name} ist bereit.`,
+        description: run.room_id ? `${run.name} ist mit Raum bereit.` : `${run.name} ist bereit.`,
       });
       return run;
     } catch (error: unknown) {
       toast.error("Run konnte nicht erstellt werden", {
         description: getErrorMessage(error, "Bitte erneut versuchen."),
+      });
+      throw error;
+    }
+  }
+
+  async function handleJoinRoom(input: RoomJoinInput): Promise<void> {
+    try {
+      const joined = await joinRoomState.joinRoom(input);
+      toast.success("Raum beigetreten", {
+        description: `${joined.member.display_name} ist im Raum ${joined.room.join_code}.`,
+      });
+    } catch (error: unknown) {
+      toast.error("Raum konnte nicht beigetreten werden", {
+        description: getErrorMessage(error, "Bitte Code prüfen und erneut versuchen."),
       });
       throw error;
     }
@@ -152,7 +169,7 @@ export function HomePage() {
         <div className="order-1 min-w-0 space-y-5 xl:order-2">
           <WorkspaceHero stats={workspaceStats} />
 
-          <EntryActionCards />
+          <EntryActionCards joinRoomState={joinRoomState} onJoinRoom={handleJoinRoom} />
 
           <RecentRunsSection
             message={runsState.message}
