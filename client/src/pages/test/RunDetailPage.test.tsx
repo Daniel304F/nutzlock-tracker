@@ -40,6 +40,7 @@ const tracker = {
           encounter_status: "caught",
           gender: null,
           id: "encounter-1",
+          is_shiny: true,
           level: 4,
           location_slot_id: "location-1",
           member_id: null,
@@ -172,6 +173,10 @@ describe("RunDetailPage", () => {
     expect(screen.getByText("zigzagoon")).toBeInTheDocument();
     expect(screen.getByText("Zip")).toBeInTheDocument();
     expect(screen.getByText("Box")).toBeInTheDocument();
+    expect(screen.getAllByText("Shiny").length).toBeGreaterThan(1);
+    expect(screen.queryByLabelText("Level")).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: "Geflohen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: "Getötet" })).not.toBeInTheDocument();
   });
 
   it("submits a new caught encounter and shows success feedback", async () => {
@@ -187,16 +192,17 @@ describe("RunDetailPage", () => {
     await user.type(screen.getByLabelText("Gebiet"), "Route 102");
     await user.type(screen.getByLabelText("Spezies"), "poochyena");
     await user.type(screen.getByLabelText("Spitzname"), "Byte");
-    await user.type(screen.getByLabelText("Level"), "5");
+    await user.click(screen.getByLabelText("Shiny"));
     await user.click(screen.getByRole("button", { name: "Encounter speichern" }));
 
     await waitFor(() => {
       expect(recordEncounterMock).toHaveBeenCalledWith({
         encounter_status: "caught",
-        level: 5,
+        is_shiny: true,
         location_name: "Route 102",
         member_id: undefined,
         nickname: "Byte",
+        notes: undefined,
         species_ref: "poochyena",
       });
     });
@@ -230,10 +236,11 @@ describe("RunDetailPage", () => {
     await waitFor(() => {
       expect(recordEncounterMock).toHaveBeenCalledWith({
         encounter_status: "caught",
-        level: undefined,
+        is_shiny: false,
         location_name: "Route 30",
         member_id: "member-2",
         nickname: undefined,
+        notes: undefined,
         species_ref: "sentret",
       });
     });

@@ -7,6 +7,7 @@ import {
   RefreshCw,
   Save,
   ShieldAlert,
+  Sparkles,
 } from "lucide-react";
 
 import type {
@@ -37,10 +38,6 @@ type RunDetailPageProps = {
 const encounterStatusOptions = [
   { description: "Pokemon wird verwaltet", label: "Gefangen", value: "caught" },
   { description: "Nicht gefangen", label: "Fehlgeschlagen", value: "failed" },
-  { description: "Geflohen", label: "Geflohen", value: "fled" },
-  { description: "Vor Fang besiegt", label: "Getötet", value: "killed_before_catch" },
-  { description: "Kein Eintrag", label: "Verpasst", value: "missed" },
-  { description: "Zaehlt nicht", label: "Dupe", value: "dupe_skipped" },
 ] as const satisfies ReadonlyArray<{
   description: string;
   label: string;
@@ -79,20 +76,13 @@ function getFormText(formData: FormData, key: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function getOptionalNumber(formData: FormData, key: string): number | undefined {
-  const value = getFormText(formData, key);
-
-  if (!value) {
-    return undefined;
-  }
-
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : undefined;
-}
-
 function getOptionalText(formData: FormData, key: string): string | undefined {
   const value = getFormText(formData, key);
   return value || undefined;
+}
+
+function getCheckboxValue(formData: FormData, key: string): boolean {
+  return formData.get(key) === "on";
 }
 
 type EncounterEntryFormProps = {
@@ -107,10 +97,10 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
   const locationId = useId();
   const speciesId = useId();
   const nicknameId = useId();
-  const levelId = useId();
   const notesId = useId();
   const statusId = useId();
   const memberId = useId();
+  const shinyId = useId();
   const writableMembers = useMemo(
     () => memberOptions.filter((member) => member.role !== "viewer"),
     [memberOptions],
@@ -132,7 +122,7 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
     const formData = new FormData(form);
     const input: NewEncounterInput = {
       encounter_status: encounterStatus,
-      level: getOptionalNumber(formData, "level"),
+      is_shiny: getCheckboxValue(formData, "is_shiny"),
       location_name: getFormText(formData, "location_name"),
       member_id: selectedMemberId,
       nickname: getOptionalText(formData, "nickname"),
@@ -169,7 +159,7 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
         </div>
 
         <div className="space-y-5 px-5 py-5">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4">
             <div className="space-y-1.5">
               <Label htmlFor={locationId}>Gebiet</Label>
               <Input
@@ -203,19 +193,6 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
                 name="nickname"
                 placeholder="Zip"
                 type="text"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor={levelId}>Level</Label>
-              <Input
-                className="min-h-11 bg-background/70"
-                disabled={isDisabled}
-                id={levelId}
-                inputMode="numeric"
-                max={100}
-                min={1}
-                name="level"
-                type="number"
               />
             </div>
           </div>
@@ -278,7 +255,7 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
             <legend className="text-sm font-medium text-foreground">Status</legend>
             <RadioGroup
               aria-label="Encounter-Status"
-              className="mt-2 grid gap-2 sm:grid-cols-2"
+              className="mt-2 grid gap-2"
               disabled={isSubmitting}
               name="encounter_status"
               value={encounterStatus}
@@ -324,6 +301,29 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
             </RadioGroup>
           </fieldset>
 
+          <Label
+            className="grid min-h-14 cursor-pointer grid-cols-[2rem_minmax(0,1fr)] items-center gap-3 rounded-md border border-border/80 bg-background/60 px-3 py-2 text-sm transition-colors hover:border-primary/40 hover:bg-secondary/80"
+            htmlFor={shinyId}
+          >
+            <input
+              aria-label="Shiny"
+              className="size-4 rounded border-border accent-primary"
+              disabled={isDisabled}
+              id={shinyId}
+              name="is_shiny"
+              type="checkbox"
+            />
+            <span className="min-w-0">
+              <span className="flex items-center gap-2 font-semibold leading-5">
+                <Sparkles aria-hidden="true" className="size-4 text-hibiscus" />
+                Shiny
+              </span>
+              <span className="block text-xs leading-4 text-muted-foreground">
+                Markiert diesen Encounter als Shiny-Klausel-Fall.
+              </span>
+            </span>
+          </Label>
+
           <div className="space-y-1.5">
             <Label htmlFor={notesId}>Notizen</Label>
             <Textarea
@@ -362,6 +362,12 @@ function EncounterRow({ encounter }: { encounter: EncounterWithPokemonResponse }
             <Badge className="rounded-md" variant={encounter.encounter_status === "caught" ? "emerald" : "amber"}>
               {encounterStatusLabels[encounter.encounter_status]}
             </Badge>
+            {encounter.is_shiny ? (
+              <Badge className="rounded-md" variant="violet">
+                <Sparkles aria-hidden="true" />
+                Shiny
+              </Badge>
+            ) : null}
             {pokemon ? (
               <Badge className="rounded-md" variant="violet">
                 {rosterStatusLabels[pokemon.roster_status]}
@@ -375,12 +381,6 @@ function EncounterRow({ encounter }: { encounter: EncounterWithPokemonResponse }
             <p className="text-sm text-muted-foreground">{encounter.nickname}</p>
           ) : null}
         </div>
-
-        {encounter.level ? (
-          <div className="w-fit rounded-md border border-border/70 bg-card px-3 py-2 text-sm font-semibold tabular-nums text-foreground">
-            Lv. {encounter.level}
-          </div>
-        ) : null}
       </div>
     </li>
   );
