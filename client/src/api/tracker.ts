@@ -1,4 +1,5 @@
 import { apiClient } from "@api/client";
+import type { RoomResponse } from "@api/rooms";
 import type { RunResponse } from "@api/runs";
 
 export type EncounterStatus =
@@ -100,6 +101,7 @@ export type EncounterRecordResponse = {
 
 export type RunTrackerResponse = {
   locations: LocationSlotResponse[];
+  room: RoomResponse | null;
   run: RunResponse;
 };
 

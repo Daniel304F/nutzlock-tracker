@@ -19,6 +19,7 @@ const mockedApiClient = vi.mocked(apiClient);
 
 const trackerResponse: RunTrackerResponse = {
   locations: [],
+  room: null,
   run: {
     challenge_mode: "nuzlocke",
     created_at: "2026-05-24T17:00:00Z",
