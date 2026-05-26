@@ -79,6 +79,7 @@ const tracker = {
       updated_at: "2026-05-24T17:02:00Z",
     },
   ],
+  room: null,
   run: {
     challenge_mode: "nuzlocke",
     created_at: "2026-05-24T17:00:00Z",
@@ -93,6 +94,43 @@ const tracker = {
     ruleset_id: "ruleset-1",
     status: "active",
     updated_at: "2026-05-24T17:00:00Z",
+  },
+} as const;
+
+const soullinkTracker = {
+  ...tracker,
+  locations: [],
+  room: {
+    created_at: "2026-05-24T17:00:00Z",
+    created_by_member_id: "member-1",
+    id: "room-1",
+    join_code: "ABCD2345EF",
+    join_code_revoked_at: null,
+    members: [
+      {
+        display_name: "Spieler 1",
+        id: "member-1",
+        joined_at: "2026-05-24T17:00:00Z",
+        last_seen_at: null,
+        role: "owner",
+      },
+      {
+        display_name: "Sam",
+        id: "member-2",
+        joined_at: "2026-05-24T17:05:00Z",
+        last_seen_at: null,
+        role: "partner",
+      },
+    ],
+    read_only_token: null,
+    run_id: "run-1",
+    updated_at: "2026-05-24T17:05:00Z",
+  },
+  run: {
+    ...tracker.run,
+    challenge_mode: "soullink",
+    name: "HeartGold shared",
+    room_id: "room-1",
   },
 } as const;
 
@@ -164,6 +202,40 @@ describe("RunDetailPage", () => {
     });
     expect(toastMock.success).toHaveBeenCalledWith("Encounter gespeichert", {
       description: "poochyena wurde eingetragen.",
+    });
+  });
+
+  it("submits soullink encounters with the selected room member", async () => {
+    const user = userEvent.setup();
+    useRunTrackerMock.mockReturnValueOnce({
+      message: null,
+      recordEncounter: recordEncounterMock,
+      refresh: refreshMock,
+      status: "ready",
+      tracker: soullinkTracker,
+    });
+    recordEncounterMock.mockResolvedValueOnce({
+      encounter: { id: "encounter-2" },
+      pokemon: { id: "pokemon-2" },
+      warnings: [],
+    });
+
+    renderRunDetailPage();
+
+    await user.click(screen.getByRole("radio", { name: "Sam" }));
+    await user.type(screen.getByLabelText("Gebiet"), "Route 30");
+    await user.type(screen.getByLabelText("Spezies"), "sentret");
+    await user.click(screen.getByRole("button", { name: "Encounter speichern" }));
+
+    await waitFor(() => {
+      expect(recordEncounterMock).toHaveBeenCalledWith({
+        encounter_status: "caught",
+        level: undefined,
+        location_name: "Route 30",
+        member_id: "member-2",
+        nickname: undefined,
+        species_ref: "sentret",
+      });
     });
   });
 });

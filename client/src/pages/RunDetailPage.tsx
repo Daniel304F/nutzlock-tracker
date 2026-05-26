@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
 import {
   AlertCircle,
   ArrowLeft,
@@ -14,6 +14,7 @@ import type {
   EncounterWithPokemonResponse,
   LocationSlotResponse,
 } from "@api/tracker";
+import type { RoomMemberResponse } from "@api/rooms";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -95,19 +96,35 @@ function getOptionalText(formData: FormData, key: string): string | undefined {
 }
 
 type EncounterEntryFormProps = {
-  disabled?: boolean;
+  memberOptions?: RoomMemberResponse[];
   onRecord: (input: NewEncounterInput) => Promise<void>;
 };
 
-function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormProps) {
+function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryFormProps) {
   const [encounterStatus, setEncounterStatus] = useState<EncounterStatus>("caught");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | undefined>();
   const locationId = useId();
   const speciesId = useId();
   const nicknameId = useId();
   const levelId = useId();
   const notesId = useId();
   const statusId = useId();
+  const memberId = useId();
+  const writableMembers = useMemo(
+    () => memberOptions.filter((member) => member.role !== "viewer"),
+    [memberOptions],
+  );
+  const requiresMember = writableMembers.length > 0;
+  const isDisabled = isSubmitting || (requiresMember && !selectedMemberId);
+
+  useEffect(() => {
+    if (selectedMemberId || writableMembers.length === 0) {
+      return;
+    }
+
+    setSelectedMemberId(writableMembers[0]?.id);
+  }, [selectedMemberId, writableMembers]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -117,7 +134,7 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
       encounter_status: encounterStatus,
       level: getOptionalNumber(formData, "level"),
       location_name: getFormText(formData, "location_name"),
-      member_id: undefined,
+      member_id: selectedMemberId,
       nickname: getOptionalText(formData, "nickname"),
       notes: getOptionalText(formData, "notes"),
       species_ref: getOptionalText(formData, "species_ref"),
@@ -157,7 +174,7 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
               <Label htmlFor={locationId}>Gebiet</Label>
               <Input
                 className="min-h-11 bg-background/70"
-                disabled={disabled || isSubmitting}
+                disabled={isDisabled}
                 id={locationId}
                 name="location_name"
                 placeholder="Route 101"
@@ -169,7 +186,7 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
               <Label htmlFor={speciesId}>Spezies</Label>
               <Input
                 className="min-h-11 bg-background/70"
-                disabled={disabled || isSubmitting}
+                disabled={isDisabled}
                 id={speciesId}
                 name="species_ref"
                 placeholder="zigzagoon"
@@ -181,7 +198,7 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
               <Label htmlFor={nicknameId}>Spitzname</Label>
               <Input
                 className="min-h-11 bg-background/70"
-                disabled={disabled || isSubmitting}
+                disabled={isDisabled}
                 id={nicknameId}
                 name="nickname"
                 placeholder="Zip"
@@ -192,7 +209,7 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
               <Label htmlFor={levelId}>Level</Label>
               <Input
                 className="min-h-11 bg-background/70"
-                disabled={disabled || isSubmitting}
+                disabled={isDisabled}
                 id={levelId}
                 inputMode="numeric"
                 max={100}
@@ -203,12 +220,66 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
             </div>
           </div>
 
+          {writableMembers.length > 0 ? (
+            <fieldset>
+              <legend className="text-sm font-medium text-foreground">Spieler</legend>
+              <RadioGroup
+                aria-label="Spieler"
+                className="mt-2 grid gap-2 sm:grid-cols-2"
+                disabled={isSubmitting}
+                name="member_id"
+                value={selectedMemberId}
+                onValueChange={setSelectedMemberId}
+              >
+                {writableMembers.map((member) => {
+                  const itemId = `${memberId}-${member.id}`;
+                  const isSelected = selectedMemberId === member.id;
+
+                  return (
+                    <Label
+                      className={cn(
+                        "grid min-h-12 cursor-pointer grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
+                        isSelected
+                          ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/20"
+                          : "border-border/80 bg-background/60 hover:border-primary/40 hover:bg-secondary/80",
+                      )}
+                      htmlFor={itemId}
+                      key={member.id}
+                    >
+                      <RadioGroupItem
+                        aria-label={member.display_name}
+                        className="sr-only"
+                        id={itemId}
+                        value={member.id}
+                      />
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "size-3 rounded-full border border-border bg-background",
+                          isSelected && "border-primary bg-primary",
+                        )}
+                      />
+                      <span className="min-w-0">
+                        <span className="block truncate font-semibold leading-5">
+                          {member.display_name}
+                        </span>
+                        <span className="block text-xs leading-4 text-muted-foreground">
+                          {member.role === "owner" ? "Owner" : "Partner"}
+                        </span>
+                      </span>
+                    </Label>
+                  );
+                })}
+              </RadioGroup>
+            </fieldset>
+          ) : null}
+
           <fieldset>
             <legend className="text-sm font-medium text-foreground">Status</legend>
             <RadioGroup
               aria-label="Encounter-Status"
               className="mt-2 grid gap-2 sm:grid-cols-2"
-              disabled={disabled || isSubmitting}
+              disabled={isSubmitting}
               name="encounter_status"
               value={encounterStatus}
               onValueChange={(next) => setEncounterStatus(next as EncounterStatus)}
@@ -257,7 +328,7 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
             <Label htmlFor={notesId}>Notizen</Label>
             <Textarea
               className="min-h-20 bg-background/70"
-              disabled={disabled || isSubmitting}
+              disabled={isDisabled}
               id={notesId}
               name="notes"
               placeholder="Fundumstände, Route-Sonderfall, Hausregel"
@@ -268,7 +339,7 @@ function EncounterEntryForm({ disabled = false, onRecord }: EncounterEntryFormPr
         <div className="border-t border-border/70 bg-background/35 px-5 py-4">
           <Button
             className="min-h-11 w-full shadow-sm"
-            disabled={disabled || isSubmitting}
+            disabled={isDisabled}
             type="submit"
           >
             <Save aria-hidden="true" />
@@ -388,15 +459,15 @@ export function RunDetailPage({ runId }: RunDetailPageProps) {
       <section className="grid flex-1 gap-5 py-5 xl:grid-cols-[440px_minmax(0,1fr)] 2xl:grid-cols-[460px_minmax(0,1fr)] 2xl:gap-6">
         <aside className="order-2 min-w-0 xl:sticky xl:top-24 xl:order-1 xl:self-start">
           <EncounterEntryForm
-            disabled={tracker?.run.challenge_mode === "soullink"}
+            memberOptions={tracker?.room?.members}
             onRecord={handleRecordEncounter}
           />
-          {tracker?.run.challenge_mode === "soullink" ? (
+          {tracker?.run.challenge_mode === "soullink" && !tracker.room ? (
             <Alert className="mt-3 border-neon/40 bg-neon/10">
               <ShieldAlert aria-hidden="true" />
               <AlertDescription>
-                Soullink-Encounter brauchen als nächste Scheibe die
-                Mitgliederauswahl. Solo-Runs können hier bereits speichern.
+                Room-Mitglieder konnten nicht geladen werden. Encounter werden
+                erst gespeichert, wenn ein Spieler gewählt werden kann.
               </AlertDescription>
             </Alert>
           ) : null}
