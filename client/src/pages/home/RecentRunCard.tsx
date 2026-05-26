@@ -52,6 +52,7 @@ export function RecentRunCard({ run }: RecentRunCardProps) {
           <RunBadge tone={run.challenge_mode === "soullink" ? "sky" : "emerald"}>
             {challengeModeLabels[run.challenge_mode]}
           </RunBadge>
+          {run.room_id ? <RunBadge tone="sky">Raum bereit</RunBadge> : null}
           {run.is_randomizer ? <RunBadge tone="violet">Randomizer</RunBadge> : null}
         </CardAction>
       </CardHeader>
