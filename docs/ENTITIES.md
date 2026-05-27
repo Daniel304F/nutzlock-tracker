@@ -140,6 +140,7 @@ The recorded encounter for a member in a location slot.
 | `species_ref` | string? | Species key when known. |
 | `nickname` | string? | Optional nickname. |
 | `encounter_status` | enum | `caught`, `failed`, `fled`, `killed_before_catch`, `missed`, `dupe_skipped`. |
+| `is_shiny` | boolean | Whether the encounter was shiny. Shiny is a trait, not a status. |
 | `level` | integer? | Optional level. |
 | `gender` | enum? | Optional gender. |
 | `nature` | string? | Optional nature. |
@@ -318,4 +319,3 @@ Never export password hashes, reset token hashes, private local identity hashes,
 - Team synchrony is a warning when linked partners are not all alive and in team together.
 - Randomizer file metadata is documentary; it must not alter validation unless later requirements say so.
 - Reference cache entities must never be mutated by run-specific randomizer overrides.
-

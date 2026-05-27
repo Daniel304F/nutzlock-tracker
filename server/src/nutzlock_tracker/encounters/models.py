@@ -38,6 +38,7 @@ class Encounter(Base):
     species_ref: Mapped[str | None] = mapped_column(String(80), nullable=True)
     nickname: Mapped[str | None] = mapped_column(String(80), nullable=True)
     encounter_status: Mapped[str] = mapped_column(String(32), nullable=False)
+    is_shiny: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     level: Mapped[int | None] = mapped_column(Integer, nullable=True)
     gender: Mapped[str | None] = mapped_column(String(16), nullable=True)
     nature: Mapped[str | None] = mapped_column(String(80), nullable=True)
