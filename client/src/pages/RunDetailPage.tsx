@@ -96,7 +96,6 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
   const [selectedMemberId, setSelectedMemberId] = useState<string | undefined>();
   const locationId = useId();
   const speciesId = useId();
-  const nicknameId = useId();
   const notesId = useId();
   const statusId = useId();
   const memberId = useId();
@@ -181,17 +180,6 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
                 name="species_ref"
                 placeholder="zigzagoon"
                 required={encounterStatus === "caught"}
-                type="text"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor={nicknameId}>Spitzname</Label>
-              <Input
-                className="min-h-11 bg-background/70"
-                disabled={isDisabled}
-                id={nicknameId}
-                name="nickname"
-                placeholder="Zip"
                 type="text"
               />
             </div>

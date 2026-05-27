@@ -169,6 +169,7 @@ describe("RunDetailPage", () => {
     );
     expect(screen.getByRole("heading", { name: "Encounter eintragen" })).toBeInTheDocument();
     expect(screen.getByLabelText("Gebiet")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Spitzname")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Route 101" })).toBeInTheDocument();
     expect(screen.getByText("zigzagoon")).toBeInTheDocument();
     expect(screen.getByText("Zip")).toBeInTheDocument();
@@ -191,7 +192,6 @@ describe("RunDetailPage", () => {
 
     await user.type(screen.getByLabelText("Gebiet"), "Route 102");
     await user.type(screen.getByLabelText("Spezies"), "poochyena");
-    await user.type(screen.getByLabelText("Spitzname"), "Byte");
     await user.click(screen.getByLabelText("Shiny"));
     await user.click(screen.getByRole("button", { name: "Encounter speichern" }));
 
@@ -201,7 +201,7 @@ describe("RunDetailPage", () => {
         is_shiny: true,
         location_name: "Route 102",
         member_id: undefined,
-        nickname: "Byte",
+        nickname: undefined,
         notes: undefined,
         species_ref: "poochyena",
       });
