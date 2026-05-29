@@ -57,6 +57,7 @@ class EncounterCreate(BaseModel):
     ability: str | None = Field(default=None, max_length=80)
     encounter_status: EncounterStatus
     gender: Gender | None = None
+    is_shiny: bool = False
     level: int | None = Field(default=None, ge=1, le=100)
     location_slot_id: str = Field(min_length=1, max_length=36)
     member_id: str | None = Field(default=None, max_length=36)
@@ -89,6 +90,7 @@ class EncounterResponse(BaseModel):
     encounter_status: EncounterStatus
     gender: Gender | None
     id: str
+    is_shiny: bool
     level: int | None
     location_slot_id: str
     member_id: str | None

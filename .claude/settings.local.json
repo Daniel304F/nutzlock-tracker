@@ -13,7 +13,16 @@
       "PowerShell(Get-Process | Where-Object {$_.ProcessName -match \"python|uvicorn\"} | Select-Object Id, ProcessName, MainWindowTitle, Path)",
       "PowerShell($path = \"D:\\\\nutzlock-tracker\\\\server\\\\data\\\\nutzlock_tracker.db\"; $handles = & \"$env:SystemRoot\\\\System32\\\\openfiles.exe\" /query /fo csv 2>&1 | Select-String \"nutzlock_tracker.db\"; if \\($handles\\) { $handles } else { \"No process listed via openfiles.exe — may need elevation or sysinternals handle.exe\" })",
       "PowerShell(Get-Process | Where-Object {$_.ProcessName -match \"python|uvicorn|node|sqlite\"} | Format-Table Id, ProcessName, StartTime, Path -AutoSize)",
-      "PowerShell(Stop-Process -Id 7660,24564,25356,27484 -Force -ErrorAction Continue)"
+      "PowerShell(Stop-Process -Id 7660,24564,25356,27484 -Force -ErrorAction Continue)",
+      "PowerShell(& \"d:\\\\nutzlock-tracker\\\\server\\\\start-dev.ps1\" -SkipSync -NoReload 2>&1)",
+      "PowerShell(Get-Command python -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command pip -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command pipx -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command winget -ErrorAction SilentlyContinue)",
+      "PowerShell(winget install --id=astral-sh.uv -e --accept-source-agreements --accept-package-agreements --disable-interactivity)",
+      "PowerShell($uvPath = Get-ChildItem -Path \"$env:USERPROFILE\\\\AppData\\\\Local\\\\Microsoft\\\\WinGet\\\\Packages\" -Filter \"uv.exe\" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($uvPath\\) { Write-Host \"Found uv at: $\\($uvPath.FullName\\)\"; $env:Path = \"$\\($uvPath.DirectoryName\\);$env:Path\"; & $uvPath.FullName --version } else { Write-Host \"uv.exe not found in WinGet packages\" })",
+      "PowerShell($env:Path = \"C:\\\\Users\\\\Danie\\\\AppData\\\\Local\\\\Microsoft\\\\WinGet\\\\Packages\\\\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe;$env:Path\"; & \"d:\\\\nutzlock-tracker\\\\server\\\\start-dev.ps1\" -SkipSync -NoReload)",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:8000/api/v1/health\" -UseBasicParsing -TimeoutSec 5\\).Content } catch { \"Health check failed: $_\" })"
     ],
     "additionalDirectories": [
       "d:\\nutzlock-tracker\\client"
