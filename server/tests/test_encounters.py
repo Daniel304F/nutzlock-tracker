@@ -107,7 +107,7 @@ async def test_record_caught_encounter_creates_managed_pokemon(harness: ApiHarne
         f"/api/v1/runs/{run['id']}/encounters",
         json={
             "encounter_status": "caught",
-            "level": 4,
+            "is_shiny": True,
             "location_slot_id": location["id"],
             "nickname": "Zip",
             "species_ref": "zigzagoon",
@@ -119,6 +119,7 @@ async def test_record_caught_encounter_creates_managed_pokemon(harness: ApiHarne
     assert body["warnings"] == []
     assert body["encounter"]["species_ref"] == "zigzagoon"
     assert body["encounter"]["nickname"] == "Zip"
+    assert body["encounter"]["is_shiny"] is True
     assert body["pokemon"] is not None
     assert body["pokemon"]["species_ref"] == "zigzagoon"
     assert body["pokemon"]["nickname"] == "Zip"
@@ -149,7 +150,9 @@ async def test_record_failed_encounter_does_not_create_pokemon(harness: ApiHarne
     )
 
     assert response.status_code == 201
-    assert response.json()["pokemon"] is None
+    body = response.json()
+    assert body["encounter"]["is_shiny"] is False
+    assert body["pokemon"] is None
 
 
 @pytest.mark.asyncio
@@ -231,7 +234,6 @@ async def test_run_tracker_returns_locations_with_encounters_and_pokemon(
         f"/api/v1/runs/{run['id']}/encounters",
         json={
             "encounter_status": "caught",
-            "level": 4,
             "location_slot_id": location["id"],
             "nickname": "Zip",
             "species_ref": "zigzagoon",
@@ -247,6 +249,7 @@ async def test_run_tracker_returns_locations_with_encounters_and_pokemon(
     assert body["room"] is None
     assert body["locations"][0]["id"] == location["id"]
     assert body["locations"][0]["encounters"][0]["species_ref"] == "zigzagoon"
+    assert body["locations"][0]["encounters"][0]["is_shiny"] is False
     assert body["locations"][0]["encounters"][0]["pokemon"]["nickname"] == "Zip"
 
 

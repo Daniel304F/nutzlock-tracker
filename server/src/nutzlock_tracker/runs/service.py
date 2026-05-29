@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,3 +38,15 @@ async def create_run(session: AsyncSession, payload: RunCreate) -> Run:
 async def list_runs(session: AsyncSession) -> list[Run]:
     result = await session.scalars(select(Run).order_by(Run.updated_at.desc()))
     return list(result)
+
+
+async def get_run(session: AsyncSession, run_id: str) -> Run:
+    run = await session.get(Run, run_id)
+
+    if run is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Run not found",
+        )
+
+    return run
