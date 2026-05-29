@@ -131,6 +131,19 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
   *,
   *::before,
   *::after {
@@ -141,10 +154,17 @@
     @apply bg-background text-foreground;
 
     margin: 0;
-    min-width: 320px;
+    min-width: 0;
     transition:
       background-color 200ms ease,
       color 200ms ease;
+  }
+
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
   button,
