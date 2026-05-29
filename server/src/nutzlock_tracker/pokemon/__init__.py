@@ -1,0 +1,1 @@
+"""Pokemon roster domain."""
