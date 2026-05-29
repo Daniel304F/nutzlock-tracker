@@ -4,16 +4,16 @@ import { describe, expect, it } from "vitest";
 import { AppShell } from "@layout/AppShell";
 
 describe("AppShell", () => {
-  it("renders the API status and page content", () => {
+  it("renders app chrome without API status noise", () => {
     render(
-      <AppShell apiLabel="API online" apiStatus="online">
+      <AppShell>
         <p>Run dashboard</p>
       </AppShell>,
     );
 
-    expect(screen.getByRole("status")).toHaveTextContent("API online");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.queryByText(/API online/i)).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Tracker Workspace" })).toBeInTheDocument();
     expect(screen.getByText("Run dashboard")).toBeInTheDocument();
   });
 });
-
