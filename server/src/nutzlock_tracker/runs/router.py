@@ -22,6 +22,16 @@ async def read_runs(session: DbSession) -> list[RunResponse]:
     return await service.list_runs(session)
 
 
+@router.get(
+    "/{run_id}",
+    response_model=RunResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Read a run",
+)
+async def read_run(run_id: str, session: DbSession) -> RunResponse:
+    return await service.get_run(session, run_id)
+
+
 @router.post(
     "",
     response_model=RunResponse,
