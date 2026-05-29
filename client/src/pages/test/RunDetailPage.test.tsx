@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -211,7 +211,7 @@ describe("RunDetailPage", () => {
     });
   });
 
-  it("submits soullink encounters with the selected room member", async () => {
+  it("records an encounter for each filled player column in soullink runs", async () => {
     const user = userEvent.setup();
     useRunTrackerMock.mockReturnValueOnce({
       message: null,
@@ -220,7 +220,7 @@ describe("RunDetailPage", () => {
       status: "ready",
       tracker: soullinkTracker,
     });
-    recordEncounterMock.mockResolvedValueOnce({
+    recordEncounterMock.mockResolvedValue({
       encounter: { id: "encounter-2" },
       pokemon: { id: "pokemon-2" },
       warnings: [],
@@ -228,9 +228,11 @@ describe("RunDetailPage", () => {
 
     renderRunDetailPage();
 
-    await user.click(screen.getByRole("radio", { name: "Sam" }));
+    // Each player owns a column; fill only Sam's so just his encounter is saved.
+    const samColumn = screen.getByRole("group", { name: "Sam" });
+
     await user.type(screen.getByLabelText("Gebiet"), "Route 30");
-    await user.type(screen.getByLabelText("Spezies"), "sentret");
+    await user.type(within(samColumn).getByLabelText("Spezies"), "sentret");
     await user.click(screen.getByRole("button", { name: "Encounter speichern" }));
 
     await waitFor(() => {
@@ -244,5 +246,6 @@ describe("RunDetailPage", () => {
         species_ref: "sentret",
       });
     });
+    expect(recordEncounterMock).toHaveBeenCalledTimes(1);
   });
 });

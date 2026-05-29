@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git stash *)",
+      "PowerShell(\\(Get-Content d:/nutzlock-tracker/client/src/pages/test/RunDetailPage.test.tsx | Measure-Object -Line\\).Lines)",
+      "PowerShell(cd d:/nutzlock-tracker/client; npx tsc --noEmit; \"tsc-exit=$LASTEXITCODE\"; npx vitest run src/pages/test/RunDetailPage.test.tsx 2>&1 | Select-String -Pattern \"Test Files|Tests |passed|failed\")",
+      "PowerShell(cd d:/nutzlock-tracker/client; npx vitest run src/pages/test/RunDetailPage.test.tsx 2>&1 | Select-String -Pattern \"Tests |Test Files|Unable to find|TestingLibrary\" | ForEach-Object { $_.Line })",
+      "PowerShell(cd d:/nutzlock-tracker/client; npx vitest run src/pages/test/RunDetailPage.test.tsx 2>&1 | Select-String -Pattern \"Tests |Test Files|multiple elements|Unable to find\" | ForEach-Object { $_.Line })",
+      "PowerShell(cd d:/nutzlock-tracker/client; npx vitest run src/pages/test/RunDetailPage.test.tsx 2>&1 | Select-String -Pattern \"Tests |multiple elements|Unable to find\" | ForEach-Object { $_.Line }; \"TSCSTART\"; npx tsc --noEmit 2>&1 | Select-Object -First 5; \"TSC_EXIT=$LASTEXITCODE\")",
+      "Bash(npx vitest *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(git --no-pager diff --stat HEAD)"
+    ]
+  }
+}

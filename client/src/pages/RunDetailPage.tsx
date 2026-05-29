@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import {
   AlertCircle,
   ArrowLeft,
@@ -22,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useToastService } from "@components/toast/ToastProvider";
 import { useApiHealth } from "@hooks/useApiHealth";
@@ -71,18 +70,24 @@ function getApiLabel(apiState: ReturnType<typeof useApiHealth>) {
   return apiState.message;
 }
 
-function getFormText(formData: FormData, key: string): string {
-  const value = formData.get(key);
-  return typeof value === "string" ? value.trim() : "";
-}
+// One column of the entry grid: an encounter draft for a single player.
+type PlayerColumn = {
+  key: string;
+  name: string;
+  role: string;
+  memberId?: string;
+};
 
-function getOptionalText(formData: FormData, key: string): string | undefined {
-  const value = getFormText(formData, key);
-  return value || undefined;
-}
+type PlayerDraft = {
+  species: string;
+  status: EncounterStatus;
+  isShiny: boolean;
+};
 
-function getCheckboxValue(formData: FormData, key: string): boolean {
-  return formData.get(key) === "on";
+const EMPTY_DRAFT: PlayerDraft = { isShiny: false, species: "", status: "caught" };
+
+function roleLabel(role: string): string {
+  return role === "owner" ? "Owner" : "Partner";
 }
 
 type EncounterEntryFormProps = {
@@ -91,50 +96,65 @@ type EncounterEntryFormProps = {
 };
 
 function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryFormProps) {
-  const [encounterStatus, setEncounterStatus] = useState<EncounterStatus>("caught");
+  const [location, setLocation] = useState("");
+  const [notes, setNotes] = useState("");
+  const [drafts, setDrafts] = useState<Record<string, PlayerDraft>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedMemberId, setSelectedMemberId] = useState<string | undefined>();
-  const locationId = useId();
-  const speciesId = useId();
-  const notesId = useId();
-  const statusId = useId();
-  const memberId = useId();
-  const shinyId = useId();
-  const writableMembers = useMemo(
-    () => memberOptions.filter((member) => member.role !== "viewer"),
-    [memberOptions],
-  );
-  const requiresMember = writableMembers.length > 0;
-  const isDisabled = isSubmitting || (requiresMember && !selectedMemberId);
 
-  useEffect(() => {
-    if (selectedMemberId || writableMembers.length === 0) {
-      return;
+  // One column per writable member; for solo runs fall back to a single column.
+  const columns = useMemo<PlayerColumn[]>(() => {
+    const writable = memberOptions.filter((member) => member.role !== "viewer");
+    if (writable.length === 0) {
+      return [{ key: "solo", memberId: undefined, name: "Spieler 1", role: "owner" }];
     }
+    return writable.map((member) => ({
+      key: member.id,
+      memberId: member.id,
+      name: member.display_name,
+      role: member.role,
+    }));
+  }, [memberOptions]);
 
-    setSelectedMemberId(writableMembers[0]?.id);
-  }, [selectedMemberId, writableMembers]);
+  function draftFor(key: string): PlayerDraft {
+    return drafts[key] ?? EMPTY_DRAFT;
+  }
+
+  function updateDraft(key: string, patch: Partial<PlayerDraft>) {
+    setDrafts((prev) => ({
+      ...prev,
+      [key]: { ...(prev[key] ?? EMPTY_DRAFT), ...patch },
+    }));
+  }
+
+  const hasSpecies = columns.some((column) => draftFor(column.key).species.trim() !== "");
+  const isDisabled = isSubmitting || location.trim() === "" || !hasSpecies;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const input: NewEncounterInput = {
-      encounter_status: encounterStatus,
-      is_shiny: getCheckboxValue(formData, "is_shiny"),
-      location_name: getFormText(formData, "location_name"),
-      member_id: selectedMemberId,
-      nickname: getOptionalText(formData, "nickname"),
-      notes: getOptionalText(formData, "notes"),
-      species_ref: getOptionalText(formData, "species_ref"),
-    };
+    const toSave = columns
+      .map((column) => ({ column, draft: draftFor(column.key) }))
+      .filter(({ draft }) => draft.species.trim() !== "");
+
+    if (toSave.length === 0) {
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
-      await onRecord(input);
-      form.reset();
-      setEncounterStatus("caught");
+      for (const { column, draft } of toSave) {
+        await onRecord({
+          encounter_status: draft.status,
+          is_shiny: draft.isShiny,
+          location_name: location.trim(),
+          member_id: column.memberId,
+          notes: notes.trim() || undefined,
+          species_ref: draft.species.trim() || undefined,
+        });
+      }
+      setLocation("");
+      setNotes("");
+      setDrafts({});
     } finally {
       setIsSubmitting(false);
     }
@@ -151,185 +171,135 @@ function EncounterEntryForm({ memberOptions = [], onRecord }: EncounterEntryForm
           <div className="min-w-0">
             <h2 className="text-lg font-semibold text-foreground">Encounter eintragen</h2>
             <p className="text-sm leading-5 text-muted-foreground">
-              Gebiet und Ergebnis in einem Schritt erfassen. Gefangene Encounter
-              landen automatisch in der Box.
+              Gebiet einmal festlegen und den Fund für jeden Spieler in seiner Spalte
+              erfassen. Gefangene Encounter landen automatisch in der Box.
             </p>
           </div>
         </div>
 
         <div className="space-y-5 px-5 py-5">
-          <div className="grid gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor={locationId}>Gebiet</Label>
-              <Input
-                className="min-h-11 bg-background/70"
-                disabled={isDisabled}
-                id={locationId}
-                name="location_name"
-                placeholder="Route 101"
-                required
-                type="text"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor={speciesId}>Spezies</Label>
-              <Input
-                className="min-h-11 bg-background/70"
-                disabled={isDisabled}
-                id={speciesId}
-                name="species_ref"
-                placeholder="zigzagoon"
-                required={encounterStatus === "caught"}
-                type="text"
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="encounter-location">Gebiet</Label>
+            <Input
+              className="min-h-11 bg-background/70"
+              disabled={isSubmitting}
+              id="encounter-location"
+              name="location_name"
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="Route 101"
+              required
+              type="text"
+              value={location}
+            />
           </div>
 
-          {writableMembers.length > 0 ? (
-            <fieldset>
-              <legend className="text-sm font-medium text-foreground">Spieler</legend>
-              <RadioGroup
-                aria-label="Spieler"
-                className="mt-2 grid gap-2 sm:grid-cols-2"
-                disabled={isSubmitting}
-                name="member_id"
-                value={selectedMemberId}
-                onValueChange={setSelectedMemberId}
-              >
-                {writableMembers.map((member) => {
-                  const itemId = `${memberId}-${member.id}`;
-                  const isSelected = selectedMemberId === member.id;
+          <div
+            className="grid gap-4"
+            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}
+          >
+            {columns.map((column) => {
+              const draft = draftFor(column.key);
 
-                  return (
-                    <Label
-                      className={cn(
-                        "grid min-h-12 cursor-pointer grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
-                        isSelected
-                          ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/20"
-                          : "border-border/80 bg-background/60 hover:border-primary/40 hover:bg-secondary/80",
-                      )}
-                      htmlFor={itemId}
-                      key={member.id}
-                    >
-                      <RadioGroupItem
-                        aria-label={member.display_name}
-                        className="sr-only"
-                        id={itemId}
-                        value={member.id}
-                      />
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "size-3 rounded-full border border-border bg-background",
-                          isSelected && "border-primary bg-primary",
-                        )}
-                      />
-                      <span className="min-w-0">
-                        <span className="block truncate font-semibold leading-5">
-                          {member.display_name}
-                        </span>
-                        <span className="block text-xs leading-4 text-muted-foreground">
-                          {member.role === "owner" ? "Owner" : "Partner"}
-                        </span>
-                      </span>
-                    </Label>
-                  );
-                })}
-              </RadioGroup>
-            </fieldset>
-          ) : null}
-
-          <fieldset>
-            <legend className="text-sm font-medium text-foreground">Status</legend>
-            <RadioGroup
-              aria-label="Encounter-Status"
-              className="mt-2 grid gap-2"
-              disabled={isSubmitting}
-              name="encounter_status"
-              value={encounterStatus}
-              onValueChange={(next) => setEncounterStatus(next as EncounterStatus)}
-            >
-              {encounterStatusOptions.map((option) => {
-                const itemId = `${statusId}-${option.value}`;
-                const isSelected = encounterStatus === option.value;
-
-                return (
-                  <Label
-                    className={cn(
-                      "grid min-h-14 cursor-pointer grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
-                      isSelected
-                        ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/20"
-                        : "border-border/80 bg-background/60 hover:border-primary/40 hover:bg-secondary/80",
-                    )}
-                    htmlFor={itemId}
-                    key={option.value}
-                  >
-                    <RadioGroupItem
-                      aria-label={option.label}
-                      className="sr-only"
-                      id={itemId}
-                      value={option.value}
-                    />
+              return (
+                <div
+                  aria-label={column.name}
+                  className="flex flex-col gap-4 rounded-md border border-border/80 bg-background/40 p-4"
+                  key={column.key}
+                  role="group"
+                >
+                  <div className="flex items-center gap-2.5 border-b border-border/60 pb-3">
                     <span
                       aria-hidden="true"
-                      className={cn(
-                        "size-3 rounded-full border border-border bg-background",
-                        isSelected && "border-primary bg-primary",
-                      )}
+                      className="size-2.5 shrink-0 rounded-full bg-primary"
                     />
                     <span className="min-w-0">
-                      <span className="block font-semibold leading-5">{option.label}</span>
+                      <span className="block truncate text-sm font-semibold leading-5 text-foreground">
+                        {column.name}
+                      </span>
                       <span className="block text-xs leading-4 text-muted-foreground">
-                        {option.description}
+                        {roleLabel(column.role)}
                       </span>
                     </span>
-                  </Label>
-                );
-              })}
-            </RadioGroup>
-          </fieldset>
+                  </div>
 
-          <Label
-            className="grid min-h-14 cursor-pointer grid-cols-[2rem_minmax(0,1fr)] items-center gap-3 rounded-md border border-border/80 bg-background/60 px-3 py-2 text-sm transition-colors hover:border-primary/40 hover:bg-secondary/80"
-            htmlFor={shinyId}
-          >
-            <input
-              aria-label="Shiny"
-              className="size-4 rounded border-border accent-primary"
-              disabled={isDisabled}
-              id={shinyId}
-              name="is_shiny"
-              type="checkbox"
-            />
-            <span className="min-w-0">
-              <span className="flex items-center gap-2 font-semibold leading-5">
-                <Sparkles aria-hidden="true" className="size-4 text-hibiscus" />
-                Shiny
-              </span>
-              <span className="block text-xs leading-4 text-muted-foreground">
-                Markiert diesen Encounter als Shiny-Klausel-Fall.
-              </span>
-            </span>
-          </Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`species-${column.key}`}>Spezies</Label>
+                    <Input
+                      className="min-h-11 bg-background/70"
+                      disabled={isSubmitting}
+                      id={`species-${column.key}`}
+                      onChange={(event) =>
+                        updateDraft(column.key, { species: event.target.value })
+                      }
+                      placeholder="zigzagoon"
+                      type="text"
+                      value={draft.species}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <span className="text-sm font-medium text-foreground">Status</span>
+                    <div className="grid grid-cols-2 gap-1.5 rounded-md border border-border/80 bg-background/60 p-1">
+                      {encounterStatusOptions.map((option) => {
+                        const isSelected = draft.status === option.value;
+
+                        return (
+                          <button
+                            className={cn(
+                              "rounded-sm px-2 py-2 text-sm font-semibold transition-colors",
+                              isSelected
+                                ? "bg-primary/15 text-foreground ring-1 ring-primary/30"
+                                : "text-muted-foreground hover:bg-secondary/80",
+                            )}
+                            disabled={isSubmitting}
+                            key={option.value}
+                            onClick={() => updateDraft(column.key, { status: option.value })}
+                            type="button"
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <Label
+                    className="flex cursor-pointer items-center gap-2.5 text-sm font-semibold leading-5"
+                    htmlFor={`shiny-${column.key}`}
+                  >
+                    <input
+                      checked={draft.isShiny}
+                      className="size-4 rounded border-border accent-primary"
+                      disabled={isSubmitting}
+                      id={`shiny-${column.key}`}
+                      onChange={(event) =>
+                        updateDraft(column.key, { isShiny: event.target.checked })
+                      }
+                      type="checkbox"
+                    />
+                    <Sparkles aria-hidden="true" className="size-4 text-hibiscus" />
+                    Shiny
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor={notesId}>Notizen</Label>
+            <Label htmlFor="encounter-notes">Notizen</Label>
             <Textarea
               className="min-h-20 bg-background/70"
-              disabled={isDisabled}
-              id={notesId}
-              name="notes"
+              disabled={isSubmitting}
+              id="encounter-notes"
+              onChange={(event) => setNotes(event.target.value)}
               placeholder="Fundumstände, Route-Sonderfall, Hausregel"
+              value={notes}
             />
           </div>
         </div>
 
         <div className="border-t border-border/70 bg-background/35 px-5 py-4">
-          <Button
-            className="min-h-11 w-full shadow-sm"
-            disabled={isDisabled}
-            type="submit"
-          >
+          <Button className="min-h-11 w-full shadow-sm" disabled={isDisabled} type="submit">
             <Save aria-hidden="true" />
             Encounter speichern
           </Button>
@@ -444,89 +414,85 @@ export function RunDetailPage({ runId }: RunDetailPageProps) {
 
   return (
     <AppShell apiLabel={getApiLabel(apiState)} apiStatus={apiState.status}>
-      <section className="grid flex-1 gap-5 py-5 xl:grid-cols-[440px_minmax(0,1fr)] 2xl:grid-cols-[460px_minmax(0,1fr)] 2xl:gap-6">
-        <aside className="order-2 min-w-0 xl:sticky xl:top-24 xl:order-1 xl:self-start">
-          <EncounterEntryForm
-            memberOptions={tracker?.room?.members}
-            onRecord={handleRecordEncounter}
-          />
-          {tracker?.run.challenge_mode === "soullink" && !tracker.room ? (
-            <Alert className="mt-3 border-neon/40 bg-neon/10">
-              <ShieldAlert aria-hidden="true" />
-              <AlertDescription>
-                Room-Mitglieder konnten nicht geladen werden. Encounter werden
-                erst gespeichert, wenn ein Spieler gewählt werden kann.
-              </AlertDescription>
-            </Alert>
-          ) : null}
-        </aside>
-
-        <div className="order-1 min-w-0 space-y-5 xl:order-2">
-          <section className="rounded-lg border border-border/80 bg-card/85 p-5 shadow-sm">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <Button asChild className="mb-4 w-fit" size="sm" variant="outline">
-                  <a href="/workspace">
-                    <ArrowLeft aria-hidden="true" />
-                    Zurück zu Runs
-                  </a>
-                </Button>
-                <p className="text-xs font-semibold uppercase text-muted-foreground">
-                  Tracker-Run
-                </p>
-                <h1 className="mt-1 break-words text-3xl font-semibold text-foreground sm:text-4xl">
-                  {tracker?.run.name ?? "Run wird geladen"}
-                </h1>
-                {tracker ? (
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {tracker.run.game_version_ref} · {tracker.run.player_count} Spieler
-                  </p>
-                ) : null}
-              </div>
-
-              <Button
-                className="w-full sm:w-fit"
-                disabled={trackerState.status === "loading"}
-                size="sm"
-                type="button"
-                variant="outline"
-                onClick={() => void trackerState.refresh()}
-              >
-                <RefreshCw aria-hidden="true" />
-                Aktualisieren
+      <section className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-5 py-5">
+        <section className="rounded-lg border border-border/80 bg-card/85 p-5 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <Button asChild className="mb-4 w-fit" size="sm" variant="outline">
+                <a href="/workspace">
+                  <ArrowLeft aria-hidden="true" />
+                  Zurück zu Runs
+                </a>
               </Button>
+              <p className="text-xs font-semibold uppercase text-muted-foreground">
+                Tracker-Run
+              </p>
+              <h1 className="mt-1 break-words text-3xl font-semibold text-foreground sm:text-4xl">
+                {tracker?.run.name ?? "Run wird geladen"}
+              </h1>
+              {tracker ? (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {tracker.run.game_version_ref} · {tracker.run.player_count} Spieler
+                </p>
+              ) : null}
             </div>
-          </section>
 
-          {trackerState.status === "loading" ? (
-            <Alert className="border-border/80 bg-background/60">
-              <AlertDescription>Tracker wird geladen</AlertDescription>
-            </Alert>
-          ) : null}
+            <Button
+              className="w-full sm:w-fit"
+              disabled={trackerState.status === "loading"}
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={() => void trackerState.refresh()}
+            >
+              <RefreshCw aria-hidden="true" />
+              Aktualisieren
+            </Button>
+          </div>
+        </section>
 
-          {trackerState.status === "error" ? (
-            <Alert className="border-destructive/30 bg-destructive/10" variant="destructive">
-              <AlertCircle aria-hidden="true" />
-              <AlertDescription>{trackerState.message}</AlertDescription>
-            </Alert>
-          ) : null}
+        <EncounterEntryForm
+          memberOptions={tracker?.room?.members}
+          onRecord={handleRecordEncounter}
+        />
+        {tracker?.run.challenge_mode === "soullink" && !tracker.room ? (
+          <Alert className="border-neon/40 bg-neon/10">
+            <ShieldAlert aria-hidden="true" />
+            <AlertDescription>
+              Room-Mitglieder konnten nicht geladen werden. Encounter werden für die
+              Spieler erst korrekt zugeordnet, sobald der Room verfügbar ist.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
-          {trackerState.status === "ready" && tracker ? (
-            <section aria-labelledby="locations-heading" className="space-y-3">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <h2 className="text-base font-semibold text-foreground" id="locations-heading">
-                    Encounter-Liste
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {tracker.locations.length} Gebiete im Run
-                  </p>
-                </div>
+        {trackerState.status === "loading" ? (
+          <Alert className="border-border/80 bg-background/60">
+            <AlertDescription>Tracker wird geladen</AlertDescription>
+          </Alert>
+        ) : null}
+
+        {trackerState.status === "error" ? (
+          <Alert className="border-destructive/30 bg-destructive/10" variant="destructive">
+            <AlertCircle aria-hidden="true" />
+            <AlertDescription>{trackerState.message}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        {trackerState.status === "ready" && tracker ? (
+          <section aria-labelledby="locations-heading" className="space-y-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-foreground" id="locations-heading">
+                  Encounter-Liste
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {tracker.locations.length} Gebiete im Run
+                </p>
               </div>
-              <LocationList locations={tracker.locations} />
-            </section>
-          ) : null}
-        </div>
+            </div>
+            <LocationList locations={tracker.locations} />
+          </section>
+        ) : null}
       </section>
     </AppShell>
   );
